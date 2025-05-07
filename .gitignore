@@ -1,0 +1,5 @@
+build
+assets
+.vscode
+test
+*.apkg

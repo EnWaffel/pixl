@@ -1,0 +1,342 @@
+#include "pixl/core/asset/AssetManager.h"
+
+#include <vector>
+#include <istream>
+#include <filesystem>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#include <glad/glad.h>
+#include <unordered_map>
+#include <AL/al.h>
+#include <AL/alc.h>
+
+using namespace px;
+namespace fs = std::filesystem;
+
+static std::vector<APKG> __packages;
+static bool __prefer_packages = false;
+
+// Assets
+static std::unordered_map<std::string, TEXTURE> __textures;
+static std::unordered_map<std::string, AUDIOBUF> __audio_buffers;
+
+static bool EndsWith(CREFSTR filename, CREFSTR ext) {
+    if (filename.length() < ext.length()) return false;
+    return filename.compare(filename.length() - ext.length(), ext.length(), ext) == 0;
+}
+
+static int AvailableInPackages(CREFSTR path)
+{
+    int count = 0;
+    
+    for (APKG package : __packages)
+    {
+        if (package->HasFile(path)) count++;
+    }
+
+    return count;
+}
+
+static std::unique_ptr<std::istream> GetFileStream(CREFSTR path)
+{
+    if (!fs::exists(path)) return nullptr;
+    return std::make_unique<std::ifstream>(path, std::ios::binary);
+}
+
+static std::unique_ptr<std::istream> GetPackageStream(CREFSTR path)
+{
+    int count = AvailableInPackages(path);
+    if (count != 1)
+    {
+        return nullptr;
+    }
+
+    for (APKG package : __packages)
+    {
+        if (package->HasFile(path))
+        {
+            return package->OpenStream(path);
+        }
+    }
+}
+
+static std::unique_ptr<std::istream> GetStream(CREFSTR path)
+{
+    std::unique_ptr<std::istream> stream = nullptr;
+
+    if (__prefer_packages)
+    {
+        stream = GetPackageStream(path);
+        if (!stream)
+        {
+            stream = GetFileStream(path);
+        }
+    }
+    else
+    {
+        stream = GetFileStream(path);
+        if (!stream)
+        {
+            stream = GetPackageStream(path);
+        }
+    }
+
+    return stream;
+}
+
+Error px::AssetManager::Init()
+{
+    return PX_NOERROR;
+}
+
+void px::AssetManager::End()
+{
+    for (const auto& v : __textures)
+    {
+        delete v.second;
+    }
+    for (const auto& v : __audio_buffers)
+    {
+        delete v.second;
+    }
+}
+
+void px::AssetManager::AddPackage(APKG package)
+{
+    if (!package) return;
+    __packages.push_back(package);
+}
+
+void px::AssetManager::SetPreferPackages(bool flag)
+{
+    __prefer_packages = flag;
+}
+
+TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing, bool reload)
+{
+    std::unique_ptr<std::istream> stream = GetStream(path);
+    if (!stream)
+    {
+        Error::Throw(PX_ERROR_ASSET_NOT_AVAILABLE, "No file / stream found for: " + path);
+        return nullptr;
+    }
+
+    stbi_io_callbacks ioCallbacks{};
+
+    ioCallbacks.read = [](void* user, char* data, int size) -> int
+    {
+        std::istream* s = (std::istream*)user;
+        s->read(data, size);
+        return s->gcount();
+    };
+
+    ioCallbacks.skip = [](void* user, int n) -> void
+    {
+        std::istream* s = (std::istream*)user;
+        s->seekg(n, std::ios::cur);
+    };
+
+    ioCallbacks.eof = [](void* user) -> int
+    {
+        std::istream* s = (std::istream*)user;
+        return s->eof();
+    };
+
+    stbi_set_flip_vertically_on_load(false);
+
+    int width, height, channels;
+    stbi_uc* data = stbi_load_from_callbacks(&ioCallbacks, stream.get(), &width, &height, &channels, 4);
+    if (!data)
+    {
+        Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, "Failed to read image data from: " + path);
+        return nullptr;
+    }
+    
+    ImageData img{};
+    img.data = data;
+    img.width = width;
+    img.height = height;
+    img.size = width * height * 4;
+    img.format = ImageFormat::RGBA;
+
+    TEXTURE tex = LoadTexture(id, img, antialiasing, reload);
+    if (!tex)
+    {
+        stbi_image_free(data);
+        return nullptr;
+    }
+
+    stbi_image_free(data);
+
+    return tex;
+}
+
+TEXTURE px::AssetManager::LoadTexture(CREFSTR id, const ImageData& img, bool antialiasing, bool reload)
+{
+    if (__textures.count(id) > 0 && !reload)
+    {
+        return __textures.at(id);
+    }
+    else if (reload)
+    {
+        delete __textures.at(id);
+        __textures.erase(id);
+    }
+
+    if (img.width < 1 || img.height < 1 || img.size < 1)
+    {
+        Error::Throw(PX_ERROR_ASSET_INVALID_DATA, "Image size must at least be 1x1");
+        return nullptr;
+    }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glActiveTexture(GL_TEXTURE0);
+
+    GLuint tex;
+    glGenTextures(1, &tex);
+    if (!tex)
+    {
+        Error::Throw(PX_ERROR_ASSET_INTERNAL_ERROR, "OpenGL Error (glGenTextures)");
+        return nullptr;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    if (antialiasing)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+
+    GLint format = GL_INVALID_ENUM;
+
+    switch (img.format)
+    {
+    case ImageFormat::RGB:
+        format = GL_RGB;
+        break;
+    case ImageFormat::RGBA:
+        format = GL_RGBA;
+        break;
+    default:
+        Error::Throw(PX_ERROR_ASSET_INVALID_DATA, "Unknown image format: " + std::to_string((int)img.format));
+        return nullptr;
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, img.width, img.height, 0, format, GL_UNSIGNED_BYTE, img.data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    ImageData d{};
+    d.format = img.format;
+    d.width = img.width;
+    d.height = img.height;
+    d.size = tex;
+
+    TEXTURE texture = new Texture(d);
+
+    __textures.insert({ id, texture });
+
+    return texture;
+}
+
+AUDIOBUF px::AssetManager::LoadSound(CREFSTR id, CREFSTR path, bool reload)
+{
+    if (__audio_buffers.count(path) > 0 && !reload)
+    {
+        return __audio_buffers.at(path);
+    }
+    else if (reload)
+    {
+        delete __audio_buffers.at(path);
+        __audio_buffers.erase(path);
+    }
+
+    std::unique_ptr<std::istream> stream = GetStream(path);
+    if (!stream)
+    {
+        Error::Throw(PX_ERROR_ASSET_NOT_AVAILABLE, "No file / stream found for: " + path);
+        return nullptr;
+    }
+
+    AudioData data;
+
+    if (EndsWith(path, ".ogg"))
+    {
+        std::optional<AudioData> opt = AudioBuffer::DecodeOGG(*stream.get());
+        if (!opt)
+        {
+            Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, "Failed to load (ogg) audio: " + path);
+            return nullptr;
+        }
+
+        data = opt.value();
+    }
+    else
+    {
+        Error::Throw(PX_ERROR_ASSET_NOT_AVAILABLE, "Unsupported audio format: " + path);
+        return nullptr;
+    }
+
+    ALenum format = AL_FORMAT_STEREO16;
+
+    if (data.channels == 1)
+    {
+        if (data.bitsPerSample == 8)
+        {
+            format = AL_FORMAT_MONO8;
+        }
+        else if (data.bitsPerSample == 16)
+        {
+            format = AL_FORMAT_MONO16;
+        }
+    }
+    else if (data.channels == 2)
+    {
+        if (data.bitsPerSample == 8)
+        {
+            format = AL_FORMAT_STEREO8;
+        }
+        else if (data.bitsPerSample == 16)
+        {
+            format = AL_FORMAT_STEREO16;
+        }
+    }
+
+    ALuint buf;
+    alGenBuffers(1, &buf);
+
+    alBufferData(buf, format, data.data, data.size, data.sampleRate);
+
+    free(data.data);
+
+    AudioData d = data;
+    d.size = buf;
+
+    AUDIOBUF buffer = new AudioBuffer(d);
+
+    __audio_buffers.insert({ id, buffer });
+
+    return buffer;
+}
+
+TEXTURE px::AssetManager::GetTexture(CREFSTR id)
+{
+    if (__textures.count(id) < 1) return nullptr;
+    return __textures.at(id);
+}
+
+AUDIOBUF px::AssetManager::GetSound(CREFSTR id)
+{
+    if (__audio_buffers.count(id) < 1) return nullptr;
+    return __audio_buffers.at(id);
+}
