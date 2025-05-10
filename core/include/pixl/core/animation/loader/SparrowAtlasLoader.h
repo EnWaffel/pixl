@@ -16,5 +16,7 @@ namespace px
 
         PX_API static ANIMFRAMES Load(APKG package, CREFSTR path, const ImageData& img);
         PX_API static ANIMFRAMES Load(CREFSTR path, const ImageData& img);
+        PX_API static ANIMFRAMES Load(APKG package, CREFSTR path, TEXTURE tex);
+        PX_API static ANIMFRAMES Load(CREFSTR path, TEXTURE tex);
     };
 }

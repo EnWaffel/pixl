@@ -150,3 +150,15 @@ ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, const ImageData& img)
 
     return std::move(_Load(stream, img));
 }
+
+ANIMFRAMES px::SparrowAtlasLoader::Load(APKG package, CREFSTR path, TEXTURE tex)
+{
+    if (!tex) return ANIMFRAMES();
+    return std::move(Load(package, path, tex->GetData()));
+}
+
+ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, TEXTURE tex)
+{
+    if (!tex) return ANIMFRAMES();
+    return std::move(Load(path, tex->GetData()));
+}
