@@ -319,7 +319,7 @@ static void _glfw_keycallback(GLFWwindow* window, int key, int scancode, int act
     WindowImpl* wnd = (WindowImpl*)glfwGetWindowUserPointer(window);
 
     KeyEvent data{};
-    data.code = key;
+    data.code = (KeyCode)key;
 
     if (action == GLFW_PRESS)
     {
@@ -336,7 +336,7 @@ static void _glfw_mousebuttoncallback(GLFWwindow* window, int button, int action
     WindowImpl* wnd = (WindowImpl*)glfwGetWindowUserPointer(window);
 
     MouseEvent data{};
-    data.button = key;
+    data.button = (MouseButton)button;
 
     if (action == GLFW_PRESS)
     {

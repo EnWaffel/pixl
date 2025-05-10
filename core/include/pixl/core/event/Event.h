@@ -34,12 +34,12 @@ namespace px
     struct KeyEvent : public EventData
     {
         KeyCode code;
-    }
+    };
 
     struct MouseEvent : public EventData
     {
         MouseButton button;
-    }
+    };
 
     struct MouseMoveEvent : public EventData
     {
