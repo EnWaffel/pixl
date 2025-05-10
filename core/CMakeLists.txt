@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.28)
 
 project(pixl-core VERSION 0.0.1)
 
+add_compile_options(-Wall)
+
 add_library(pixl-core SHARED
 src/Core.cpp
 src/math/Vec2i.cpp
@@ -30,6 +32,7 @@ src/graphics/WindowRenderer.cpp
 src/event/EventManager.cpp
 src/tween/Tweenable.cpp
 src/tween/Easing.cpp
+src/input/KeyCode.cpp
 )
 
 target_include_directories(pixl-core PUBLIC include/ ../utility/include/ ../dependencies/glad/include/ ../dependencies/stb/ ../dependencies/openal-soft/include/ ../dependencies/rapidxml/)

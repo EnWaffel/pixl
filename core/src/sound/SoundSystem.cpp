@@ -1,7 +1,9 @@
 #include "pixl/core/sound/SoundSystem.h"
 #include "pixl/core/asset/AssetManager.h"
 
+#ifndef AL_LIBTYPE_STATIC
 #define AL_LIBTYPE_STATIC
+#endif
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <unordered_map>

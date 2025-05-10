@@ -4,7 +4,7 @@
 
 namespace px
 {
-    enum class PX_API ImageFormat : uint8_t
+    enum class ImageFormat : uint8_t
     {
         RGB = 0,
         RGBA

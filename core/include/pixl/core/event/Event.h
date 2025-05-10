@@ -3,6 +3,7 @@
 #include "pixl/utility/Defs.h"
 #include "pixl/utility/Error.h"
 #include "pixl/core/math/Vec2i.h"
+#include "pixl/core/input/KeyCode.h"
 
 #define PX_EVENT(event) (px::Event)px::Events::event
 
@@ -28,5 +29,21 @@ namespace px
     {
         Vec2i viewportPos;
         Vec2i viewportSize;
+    };
+
+    struct KeyEvent : public EventData
+    {
+        KeyCode code;
+    }
+
+    struct MouseEvent : public EventData
+    {
+        MouseButton button;
+    }
+
+    struct MouseMoveEvent : public EventData
+    {
+        float x;
+        float y;
     };
 }

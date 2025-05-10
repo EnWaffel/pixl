@@ -58,6 +58,8 @@ static std::unique_ptr<std::istream> GetPackageStream(CREFSTR path)
             return package->OpenStream(path);
         }
     }
+
+    return nullptr;
 }
 
 static std::unique_ptr<std::istream> GetStream(CREFSTR path)

@@ -66,6 +66,9 @@ void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 static void _glfw_framebuffer_resize(GLFWwindow* window, int width, int height);
+static void _glfw_keycallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+static void _glfw_mousebuttoncallback(GLFWwindow* window, int button, int action, int mods);
+static void _glfw_cursorposcallback(GLFWwindow* window, double xpos, double ypos);
 
 namespace px
 {
@@ -115,11 +118,14 @@ namespace px
 
             glfwSetWindowUserPointer(m_Handle, this);
             glfwSetFramebufferSizeCallback(m_Handle, _glfw_framebuffer_resize);
+            glfwSetKeyCallback(m_Handle, _glfw_keycallback);
+            glfwSetMouseButtonCallback(m_Handle, _glfw_mousebuttoncallback);
+            glfwSetCursorPosCallback(m_Handle, _glfw_cursorposcallback);
 
             const GLFWvidmode* vidmode = glfwGetVideoMode(primaryMonitor);
 
 #ifdef PX_WIN
-            glfwSetWindowPos(m_Handle, vidmode->width / 2 - size.x / 2, vidmode->height / 2 - size.y);
+            glfwSetWindowPos(m_Handle, vidmode->width / 2 - size.x / 2, vidmode->height / 2 - size.y / 2);
 #elif defined(PX_UNIX)
             int monitorX, monitorY;
             glfwGetMonitorPos(primaryMonitor, &monitorX, &monitorY);
@@ -306,6 +312,51 @@ static void _glfw_framebuffer_resize(GLFWwindow* window, int width, int height)
     data.viewportSize = { viewWidth, viewHeight };
 
     wnd->GetEventManager()->CallEvent(PX_EVENT(WINDOW_CHANGED), data);
+}
+
+static void _glfw_keycallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    WindowImpl* wnd = (WindowImpl*)glfwGetWindowUserPointer(window);
+
+    KeyEvent data{};
+    data.code = key;
+
+    if (action == GLFW_PRESS)
+    {
+        wnd->GetEventManager()->CallEvent(PX_EVENT(KEY_PRESS), data);
+    }
+    else if (action == GLFW_RELEASE)
+    {
+        wnd->GetEventManager()->CallEvent(PX_EVENT(KEY_RELEASE), data);
+    }
+}
+
+static void _glfw_mousebuttoncallback(GLFWwindow* window, int button, int action, int mods)
+{
+    WindowImpl* wnd = (WindowImpl*)glfwGetWindowUserPointer(window);
+
+    MouseEvent data{};
+    data.button = key;
+
+    if (action == GLFW_PRESS)
+    {
+        wnd->GetEventManager()->CallEvent(PX_EVENT(MOUSE_PRESS), data);
+    }
+    else if (action == GLFW_RELEASE)
+    {
+        wnd->GetEventManager()->CallEvent(PX_EVENT(MOUSE_RELEASE), data);
+    }
+}
+
+static void _glfw_cursorposcallback(GLFWwindow* window, double xpos, double ypos)
+{
+    WindowImpl* wnd = (WindowImpl*)glfwGetWindowUserPointer(window);
+
+    MouseMoveEvent data{};
+    data.x = xpos;
+    data.y = ypos;
+
+    wnd->GetEventManager()->CallEvent(PX_EVENT(MOUSE_MOVE), data);
 }
 
 px::Window::Window(CREFSTR title, const Vec2i& size, bool startVisible, bool decorated)

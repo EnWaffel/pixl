@@ -114,7 +114,7 @@ static ANIMFRAMES _Load(std::istream& stream, const ImageData& img)
     return std::move(frames);
 }
 
-/*
+
 ANIMFRAMES px::SparrowAtlasLoader::Load(APKG package, CREFSTR path, const ImageData& img)
 {
     if (!package)
@@ -138,7 +138,6 @@ ANIMFRAMES px::SparrowAtlasLoader::Load(APKG package, CREFSTR path, const ImageD
 
     return std::move(_Load(*stream.get(), img));
 }
-*/
 
 ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, const ImageData& img)
 {
