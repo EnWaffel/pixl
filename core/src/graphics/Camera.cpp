@@ -104,6 +104,54 @@ TW px::Camera::TweenZoom(float from, float to, float duration, const Easing::Eas
     return TweenFloat("zoom", from, to, &zoom, duration, easing, delay, callback);
 }
 
+TW px::Camera::TweenPos(CREFSTR id, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return TweenVec2(id, to, &pos, duration, easing, delay, callback);
+}
+
+TW px::Camera::TweenPos(CREFSTR id, const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return TweenVec2(id, from, to, &pos, duration, easing, delay, callback);
+}
+
+TW px::Camera::TweenPos(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    CancelTween("pos");
+    UpdateTweens(0.0f);
+    return TweenVec2("pos", to, &pos, duration, easing, delay, callback);
+}
+
+TW px::Camera::TweenPos(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    CancelTween("pos");
+    UpdateTweens(0.0f);
+    return TweenVec2("pos", from, to, &pos, duration, easing, delay, callback);
+}
+
+TW px::Camera::TweenRotation(CREFSTR id, float to, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback &callback)
+{
+    return TweenFloat(id, to, &rotation, duration, easing, delay, callback);
+}
+
+TW px::Camera::TweenRotation(CREFSTR id, float from, float to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return TweenFloat(id, from, to, &rotation, duration, easing, delay, callback);
+}
+
+TW px::Camera::TweenRotation(float to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    CancelTween("rotation");
+    UpdateTweens(0.0f);
+    return TweenFloat("rotation", to, &rotation, duration, easing, delay, callback);
+}
+
+TW px::Camera::TweenRotation(float from, float to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    CancelTween("rotation");
+    UpdateTweens(0.0f);
+    return TweenFloat("rotation", from, to, &rotation, duration, easing, delay, callback);
+}
+
 Mat4 px::Camera::CalculateViewMatrix()
 {
     Mat4 mat;

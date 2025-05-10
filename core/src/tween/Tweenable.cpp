@@ -103,6 +103,18 @@ void px::Tweenable::CancelTween(CREFSTR id)
 
 void px::Tweenable::UpdateTweens(float delta)
 {
+    if (m_DoCancelAll)
+    {
+        m_DoCancelAll = false;
+
+        for (const auto& v : m_Tweens)
+        {
+            delete v.second;
+        }
+
+        m_Tweens.clear();
+    }
+
     while (!m_CancelQueue.empty())
     {
         std::string& id = m_CancelQueue.front();
@@ -133,4 +145,9 @@ void px::Tweenable::UpdateTweens(float delta)
             CancelTween(v.first);
         }
     }
+}
+
+void px::Tweenable::CancelAll()
+{
+    m_DoCancelAll = true;
 }
