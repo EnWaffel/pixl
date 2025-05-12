@@ -6,7 +6,7 @@
 
 pixl is a (simple) 2D game engine / library made for C++. It currently supports Windows, Linux and macOS (although macOS was not tested yet)
 
-Documentation can be found [here](/).
+Documentation can be found [here](https://github.com/EnWaffel/pixl/wiki).
 
 ## Compiling pixl
 
