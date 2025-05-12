@@ -34,6 +34,7 @@ static std::string __pixl__cur_error_message;
 static bool __init = false;
 static std::string __pixl_error_popup_program;
 
+#ifndef PX_WIN
 static bool _has_program(CREFSTR name)
 {
 #ifdef PX_UNIX
@@ -44,6 +45,7 @@ static bool _has_program(CREFSTR name)
     return false;
 #endif
 }
+#endif
 
 static void _init()
 {
@@ -74,7 +76,8 @@ static void _show_error_popup(CREFSTR message)
     else if (__pixl_error_popup_program == "win")
     {
 #ifdef PX_WIN
-        MessageBox(NULL, message.c_str(), "pixl Error", MB_ICONERROR | MB_OK);
+        std::wstring str(message.begin(), message.end());
+        MessageBox(NULL, str.c_str(), L"pixl Error", MB_ICONERROR | MB_OK);
 #endif
     }
 }
