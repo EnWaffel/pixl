@@ -62,26 +62,53 @@ static std::unique_ptr<std::istream> GetPackageStream(CREFSTR path)
     return nullptr;
 }
 
-static std::unique_ptr<std::istream> GetStream(CREFSTR path)
+static std::unique_ptr<std::istream> _GetStream(CREFSTR path)
 {
+    PX_DEBUG_LOG("_GetStream()", "Requested stream for: %s", path.c_str());
     std::unique_ptr<std::istream> stream = nullptr;
+#ifdef PX_DEBUG
+    bool isPackageStream = false;
+#endif
 
     if (__prefer_packages)
     {
         stream = GetPackageStream(path);
+#ifdef PX_DEBUG
+        isPackageStream = true;
+#endif
         if (!stream)
         {
             stream = GetFileStream(path);
+#ifdef PX_DEBUG
+            isPackageStream = false;
+#endif
         }
     }
     else
     {
         stream = GetFileStream(path);
+#ifdef PX_DEBUG
+        isPackageStream = false;
+#endif
         if (!stream)
         {
             stream = GetPackageStream(path);
+#ifdef PX_DEBUG
+            isPackageStream = true;
+#endif
         }
     }
+
+#ifdef PX_DEBUG
+    if (isPackageStream)
+    {
+        PX_DEBUG_LOG("_GetStream()", "Got Package stream for: %s", path.c_str());
+    }
+    else
+    {
+        PX_DEBUG_LOG("_GetStream()", "Got File stream for: %s", path.c_str());
+    }
+#endif
 
     return stream;
 }
@@ -95,10 +122,13 @@ void px::AssetManager::End()
 {
     for (const auto& v : __textures)
     {
+        PX_DEBUG_LOG("AssetManager::End()", "Releasing texture: %s", v.first.c_str());
         delete v.second;
     }
+
     for (const auto& v : __audio_buffers)
     {
+        PX_DEBUG_LOG("AssetManager::End()", "Releasing audio buffer: %s", v.first.c_str());
         delete v.second;
     }
 }
@@ -112,6 +142,11 @@ void px::AssetManager::AddPackage(APKG package)
 void px::AssetManager::SetPreferPackages(bool flag)
 {
     __prefer_packages = flag;
+}
+
+std::unique_ptr<std::istream> px::AssetManager::GetStream(CREFSTR path)
+{
+    return std::move(_GetStream(path));
 }
 
 TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing, bool reload)

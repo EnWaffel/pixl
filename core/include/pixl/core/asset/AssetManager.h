@@ -11,6 +11,8 @@
 #define PX_ERROR_ASSET_INTERNAL_ERROR 0x42
 #define PX_ERROR_ASSET_INVALID_DATA 0x43
 
+#define PX_ASTREAM_REF(s) *s.get()
+
 namespace px
 {
     class AssetManager
@@ -23,6 +25,7 @@ namespace px
 
         PX_API static void AddPackage(APKG package);
         PX_API static void SetPreferPackages(bool flag);
+        PX_API static std::unique_ptr<std::istream> GetStream(CREFSTR path);
 
         PX_API static TEXTURE LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing = true, bool reload = false);
         PX_API static TEXTURE LoadTexture(CREFSTR id, const ImageData& img, bool antialiasing = true, bool reload = false);
