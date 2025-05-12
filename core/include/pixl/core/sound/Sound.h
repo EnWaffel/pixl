@@ -25,7 +25,7 @@ namespace px
         unsigned int m_Data;
         AUDIOBUF m_Buffer;
         float m_Volume;
-        SNDGROUP m_Group;
+        SNDGROUP m_Group{};
         bool m_Temp;
     
     friend class SoundSystem;
