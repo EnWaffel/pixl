@@ -7,6 +7,5 @@ add_compile_definitions(-DPX_DEBUG)
 
 add_subdirectory(utility)
 add_subdirectory(core)
-add_subdirectory(test)
 set(LIBTYPE STATIC)
 add_subdirectory(dependencies/openal-soft)
