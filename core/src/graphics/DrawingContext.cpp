@@ -6,6 +6,8 @@ using namespace px;
 
 px::DrawingContext::DrawingContext()
 {
+    PX_DEBUG_LOG("DrawingContext::DrawingContext()", "New DrawingContext");
+    
     glGenVertexArrays(2, m_Data);
     glGenBuffers(2, m_Data1);
 
@@ -34,6 +36,8 @@ px::DrawingContext::DrawingContext()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    PX_DEBUG_LOG("DrawingContext::DrawingContext()", "Quad Buffer done");
+
     float screenQuadVertices[] = {
         // first triangle
         1.0f,  1.0f, 0.0f, 1.0, 1.0,  // top right
@@ -58,6 +62,8 @@ px::DrawingContext::DrawingContext()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    PX_DEBUG_LOG("DrawingContext::DrawingContext()", "Screen Quad Buffer done");
 }
 
 px::DrawingContext::~DrawingContext()

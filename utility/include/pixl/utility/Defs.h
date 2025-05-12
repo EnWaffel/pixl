@@ -13,7 +13,7 @@
 #endif
 
 #if defined(PX_WIN)
-    #ifdef PXDLL_EXPORTS
+    #ifdef PX_EXPORTS
         #define PX_API __declspec(dllexport)
     #else
         #define PX_API __declspec(dllimport)
@@ -25,7 +25,10 @@
 #endif
 
 #ifdef PX_DEBUG
-#define PX_DEBUG_LOG(func, msg) std::cout << "[pixl::DEBUG] (" << __FILE__ << ":" << __LINE__ << "::" << func << ") " << msg << std::endl 
+#ifdef PX_EXPORTS
+extern void __pixl_debug_log(const char* file, int line, const char* func, const char* fmt, ...);
+#endif
+#define PX_DEBUG_LOG(func, fmt, ...) __pixl_debug_log(__FILE__, __LINE__, func, fmt, ##__VA_ARGS__)
 #else
 #define PX_DEBUG_LOG
 #endif

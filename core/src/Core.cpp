@@ -37,6 +37,8 @@ Error px::Init(const InitOptions& opts)
         return PX_ERROR_SERVICE;
     }
 
+    PX_DEBUG_LOG("px::Init()", "Init successful (GLFW version: %s)", glfwGetVersionString());
+
     return PX_NOERROR;
 }
 

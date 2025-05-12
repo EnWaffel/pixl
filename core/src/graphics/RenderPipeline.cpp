@@ -18,6 +18,7 @@ namespace px
     public:
         RenderPipelineImpl(WINDOW window) : m_Wnd(window)
         {
+            PX_DEBUG_LOG("RenderPipelineImpl::RenderPipelineImpl()", "New RenderPipeline (Parent window: 0x%x)", window);
         }
 
         ~RenderPipelineImpl()
@@ -33,6 +34,7 @@ namespace px
             element->m_Wnd = m_Wnd;
             element->Construct();
             m_Elements.push_back({ name, element });
+            PX_DEBUG_LOG("RenderPipelineImpl::AddElement()", "New PipelineElement: %s (Parent window: 0x%x)", name.c_str(), m_Wnd);
         }
 
         void AddElementBefore(CREFSTR other, CREFSTR name, PIPEELEMENT element)
@@ -51,6 +53,7 @@ namespace px
                 element->m_Wnd = m_Wnd;
                 element->Construct();
                 m_Elements.insert(it, { name, element });
+                PX_DEBUG_LOG("RenderPipelineImpl::AddElementBefore()", "New PipelineElement: (before: %s) %s (Parent window: 0x%x)", other.c_str(), name.c_str(), m_Wnd);
             }
         }
 
@@ -70,6 +73,7 @@ namespace px
                 element->m_Wnd = m_Wnd;
                 element->Construct();
                 m_Elements.insert(it, { name, element });
+                PX_DEBUG_LOG("RenderPipelineImpl::AddElementAfter()", "New PipelineElement: (after: %s) %s (Parent window: 0x%x)", other.c_str(), name.c_str(), m_Wnd);
             }
         }
 

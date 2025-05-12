@@ -104,7 +104,7 @@ namespace px
             primaryMonitor = monitors[0];
 #endif
 
-            PX_DEBUG_LOG("WindowImpl::WindowImpl()", "Creating window: title: " + title + " | width: " + std::to_string(size.x) + " | height: " + std::to_string(size.y) + " | startVisible: " + (startVisible ? "true" : "false") + " | decorated: " + (decorated ? "true" : "false"));
+            PX_DEBUG_LOG("WindowImpl::WindowImpl()", "Creating window: (parent: 0x%x) title: %s | width: %d | height: %d | startVisible: %s | decorated: %s", parent, title.c_str(), size.x, size.y, startVisible ? "true" : "false", decorated ? "true" : "false");
 
             m_Handle = glfwCreateWindow(size.x, size.y, title.c_str(), NULL, __pixl_rootwnd ? (GLFWwindow*)__pixl_rootwnd->GetHandle() : nullptr);
             if (!m_Handle)
