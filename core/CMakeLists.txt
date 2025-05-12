@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.28)
 project(pixl-core VERSION 0.0.1)
 
 add_compile_options(-Wall)
+add_compile_definitions(-DPX_EXPORTS)
+set(CMAKE_USE_RELATIVE_PATHS TRUE)
 
 add_library(pixl-core SHARED
 src/Core.cpp
