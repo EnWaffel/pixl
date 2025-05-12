@@ -20,8 +20,8 @@ namespace px
     class PipelineElement
     {
     public:
-        PX_API PipelineElement() = default;
-        PX_API virtual ~PipelineElement() = default;
+        PipelineElement() = default;
+        virtual ~PipelineElement() = default;
 
         PX_API virtual void Construct() = 0;
         PX_API virtual PipelineData Downstream(const PipelineData& data) = 0;

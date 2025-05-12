@@ -11,7 +11,7 @@
 
 namespace px
 {
-    class Tweenable
+    class PX_API Tweenable
     {
     public:
         PX_API virtual ~Tweenable();
