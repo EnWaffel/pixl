@@ -24,8 +24,6 @@ Error px::SoundSystem::Init()
     __device = alcOpenDevice(NULL);
     if (!__device)
     {
-        const ALCchar* error = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
-
         Error::Throw(PX_ERROR_SND_DEVICE, "Failed to open default device");
         return PX_ERROR_SND_DEVICE;
     }
