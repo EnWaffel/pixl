@@ -1,4 +1,5 @@
 #include "pixl/core/animation/loader/SparrowAtlasLoader.h"
+#include "pixl/core/asset/AssetManager.h"
 
 #include <fstream>
 #include <rapidxml.hpp>
@@ -60,8 +61,8 @@ static ANIMFRAMES _Load(std::istream& stream, const ImageData& img)
             
             bool trimmed = HasAttribute(node, "frameX");
             bool rotated = (HasAttribute(node, "rotated") && GetBool(node, "rotated"));
-            bool flipX = (HasAttribute(node, "flipX") && GetBool(node, "flipX"));
-            bool flipY = (HasAttribute(node, "flipY") && GetBool(node, "flipY"));
+            //bool flipX = (HasAttribute(node, "flipX") && GetBool(node, "flipX"));
+            //bool flipY = (HasAttribute(node, "flipY") && GetBool(node, "flipY"));
         
             Rect rect = {
                 GetFloat(node, "x"),
@@ -111,54 +112,24 @@ static ANIMFRAMES _Load(std::istream& stream, const ImageData& img)
         Error::Throw(PX_ERROR_INVALID_OPERATION, std::string("Failed to parse XML: ") + e.what());
     }
     
-    return std::move(frames);
+    return frames;
 }
 
-
-ANIMFRAMES px::SparrowAtlasLoader::Load(APKG package, CREFSTR path, const ImageData& img)
-{
-    if (!package)
-    {
-        Error::Throw(PX_ERROR_INVALID_OPERATION, "Package is nullptr");
-        return ANIMFRAMES();
-    }
-
-    if (!package->HasFile(path))
-    {
-        Error::Throw(PX_ERROR_INVALID_OPERATION, "File not found in package: " + path);
-        return ANIMFRAMES();
-    }
-
-    auto stream = package->OpenStream(path);
-    if (!stream)
-    {
-        Error::Throw(PX_ERROR_INVALID_OPERATION, "Failed to open package stream for: " + path);
-        return ANIMFRAMES();
-    }
-
-    return std::move(_Load(*stream.get(), img));
-}
 
 ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, const ImageData& img)
 {
-    std::ifstream stream(path);
-    if (!stream.is_open())
+    std::unique_ptr<std::istream> stream = AssetManager::GetStream(path);
+    if (!stream)
     {
-        Error::Throw(PX_ERROR_INVALID_OPERATION, "Can't open file: " + path);
+        Error::Throw(PX_ERROR_INVALID_OPERATION, "Invalid stream / file for: " + path);
         return ANIMFRAMES();
     }
 
-    return std::move(_Load(stream, img));
-}
-
-ANIMFRAMES px::SparrowAtlasLoader::Load(APKG package, CREFSTR path, TEXTURE tex)
-{
-    if (!tex) return ANIMFRAMES();
-    return std::move(Load(package, path, tex->GetData()));
+    return _Load(*stream.get(), img);
 }
 
 ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, TEXTURE tex)
 {
     if (!tex) return ANIMFRAMES();
-    return std::move(Load(path, tex->GetData()));
+    return Load(path, tex->GetData());
 }
