@@ -76,8 +76,12 @@ static void _show_error_popup(CREFSTR message)
     else if (__pixl_error_popup_program == "win")
     {
 #ifdef PX_WIN
-        std::wstring str(message.begin(), message.end());
-        MessageBox(NULL, str.c_str(), L"pixl Error", MB_ICONERROR | MB_OK);
+#ifdef __MINGW32__
+    MessageBox(NULL, message.c_str(), "pixl Error", MB_ICONERROR | MB_OK);
+#else
+    std::wstring str(message.begin(), message.end());
+    MessageBox(NULL, str.c_str(), L"pixl Error", MB_ICONERROR | MB_OK);
+#endif
 #endif
     }
 }
