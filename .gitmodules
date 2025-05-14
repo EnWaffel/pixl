@@ -7,3 +7,6 @@
 [submodule "dependencies/freetype"]
 	path = dependencies/freetype
 	url = https://github.com/freetype/freetype.git
+[submodule "dependencies/dependencies/utfcpp"]
+	path = dependencies/dependencies/utfcpp
+	url = https://github.com/nemtrif/utfcpp.git
