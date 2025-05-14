@@ -4,6 +4,7 @@
 #include "pixl/utility/Error.h"
 #include "pixl/core/math/Vec2.h"
 #include "pixl/core/math/Mat4.h"
+#include "pixl/utility/Color.h"
 
 #define PX_ERROR_SHADER_COMPILEv 0x40
 #define PX_ERROR_SHADER_COMPILEf 0x41
@@ -39,6 +40,7 @@ namespace px
         PX_API void SetMatrix4(CREFSTR name, const Mat4& mat);
         PX_API void SetVec2(CREFSTR name, const Vec2& vec);
         PX_API void SetBool(CREFSTR name, bool value);
+        PX_API void SetColor(CREFSTR name, const Color& color);
     private:
         ShaderImpl* m_Impl;
     };

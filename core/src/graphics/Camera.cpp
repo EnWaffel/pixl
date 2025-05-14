@@ -21,13 +21,18 @@ void Camera::Update(float delta)
     }
 }
 
-void Camera::Draw(DRAWINGCTX ctx, SHADER spriteShader)
+void Camera::Draw(DRAWINGCTX ctx, SHADER spriteShader, SHADER textShader)
 {
     DrawData data{};
     data.ctx = ctx;
     data.shd = spriteShader;
+    data.shd1 = textShader;
+
     data.shd->Use();
-    spriteShader->SetMatrix4("view_matrix", CalculateViewMatrix());
+    data.shd->SetMatrix4("view_matrix", CalculateViewMatrix());
+
+    data.shd1->Use();
+    data.shd1->SetMatrix4("view_matrix", CalculateViewMatrix());
 
     for (DRAWABLE drawable : m_Objects)
     {

@@ -35,6 +35,8 @@ src/event/EventManager.cpp
 src/tween/Tweenable.cpp
 src/tween/Easing.cpp
 src/input/KeyCode.cpp
+src/asset/Font.cpp
+src/graphics/Text.cpp
 )
 
 target_include_directories(pixl-core PUBLIC include/ ../utility/include/ ../dependencies/glad/include/ ../dependencies/stb/ ../dependencies/openal-soft/include/ ../dependencies/rapidxml/ ../dependencies/freetype/include/ ../dependencies/utfcpp/source/)

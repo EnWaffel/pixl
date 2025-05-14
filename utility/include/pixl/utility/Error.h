@@ -7,7 +7,8 @@
 #define PX_NOERROR px::Error()
 #define PX_SUCCESS 0
 
-#define PX_ERROR_INVALID_OPERATION 0x90
+#define PX_ERROR 0x90
+#define PX_ERROR_INVALID_OPERATION 0x91
 
 namespace px
 {

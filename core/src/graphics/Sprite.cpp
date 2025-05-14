@@ -84,7 +84,7 @@ void px::Sprite::Center(Axis axis, const Vec2& parentSize)
 	}
 }
 
-void px::Sprite::Draw(const DrawData &data)
+void px::Sprite::Draw(const DrawData& data)
 {
     data.shd->Use();
 
@@ -107,6 +107,7 @@ void px::Sprite::Draw(const DrawData &data)
 	data.shd->SetVec2("px_uv_size", uvSize);
 	data.shd->SetBool("px_flip_x", flipX);
 	data.shd->SetBool("px_flip_y", flipY);
+	data.shd->SetColor("px_color", color);
 
 	if (tex)
 	{

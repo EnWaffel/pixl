@@ -38,6 +38,8 @@
 #include "pixl/core/tween/Tween.h"
 #include "pixl/core/tween/Tweenable.h"
 #include "pixl/core/tween/Easing.h"
+#include "pixl/core/graphics/Text.h"
+#include "pixl/core/asset/Font.h"
 
 #define PX_ERROR_GLFW 0x20
 #define PX_ERROR_SERVICE 0x21

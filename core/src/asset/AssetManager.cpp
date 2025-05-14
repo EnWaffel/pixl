@@ -9,16 +9,20 @@
 #include <unordered_map>
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 using namespace px;
 namespace fs = std::filesystem;
 
 static std::vector<APKG> __packages;
 static bool __prefer_packages = false;
+static FT_Library __ft = nullptr;
 
 // Assets
 static std::unordered_map<std::string, TEXTURE> __textures;
 static std::unordered_map<std::string, AUDIOBUF> __audio_buffers;
+static std::unordered_map<std::string, FONT> __fonts;
 
 static bool EndsWith(CREFSTR filename, CREFSTR ext) {
     if (filename.length() < ext.length()) return false;
@@ -115,6 +119,13 @@ static std::unique_ptr<std::istream> _GetStream(CREFSTR path)
 
 Error px::AssetManager::Init()
 {
+    FT_Error error = FT_Init_FreeType(&__ft);
+    if (error)
+    {
+        Error::Throw(PX_ERROR_ASSET_LIB_ERROR, std::string("Failed to initialize freetype (") + FT_Error_String(error) + ")");
+        return PX_ERROR_ASSET_LIB_ERROR;
+    }
+
     return PX_NOERROR;
 }
 
@@ -125,12 +136,20 @@ void px::AssetManager::End()
         PX_DEBUG_LOG("AssetManager::End()", "Releasing texture: %s", v.first.c_str());
         delete v.second;
     }
-
+    
     for (const auto& v : __audio_buffers)
     {
         PX_DEBUG_LOG("AssetManager::End()", "Releasing audio buffer: %s", v.first.c_str());
         delete v.second;
     }
+
+    for (const auto& v : __fonts)
+    {
+        PX_DEBUG_LOG("AssetManager::End()", "Releasing font: %s", v.first.c_str());
+        delete v.second;
+    }
+
+    if (__ft) FT_Done_FreeType(__ft);
 }
 
 void px::AssetManager::AddPackage(APKG package)
@@ -214,7 +233,7 @@ TEXTURE px::AssetManager::LoadTexture(CREFSTR id, const ImageData& img, bool ant
     {
         return __textures.at(id);
     }
-    else if (reload)
+    else if (__textures.count(id) > 0 && reload)
     {
         delete __textures.at(id);
         __textures.erase(id);
@@ -288,14 +307,14 @@ TEXTURE px::AssetManager::LoadTexture(CREFSTR id, const ImageData& img, bool ant
 
 AUDIOBUF px::AssetManager::LoadSound(CREFSTR id, CREFSTR path, bool reload)
 {
-    if (__audio_buffers.count(path) > 0 && !reload)
+    if (__audio_buffers.count(id) > 0 && !reload)
     {
-        return __audio_buffers.at(path);
+        return __audio_buffers.at(id);
     }
-    else if (reload)
+    else if (__audio_buffers.count(id) > 0 && reload)
     {
-        delete __audio_buffers.at(path);
-        __audio_buffers.erase(path);
+        delete __audio_buffers.at(id);
+        __audio_buffers.erase(id);
     }
 
     std::unique_ptr<std::istream> stream = GetStream(path);
@@ -366,6 +385,52 @@ AUDIOBUF px::AssetManager::LoadSound(CREFSTR id, CREFSTR path, bool reload)
     return buffer;
 }
 
+FONT px::AssetManager::LoadFont(CREFSTR id, CREFSTR path, uint16_t size, bool antialiasing, bool reload)
+{
+    if (__fonts.count(id) > 0 && !reload)
+    {
+        return __fonts.at(id);
+    }
+    else if (__fonts.count(id) > 0 && reload)
+    {
+        delete __fonts.at(id);
+        __fonts.erase(id);
+    }
+
+    std::unique_ptr<std::istream> stream = GetStream(path);
+    if (!stream)
+    {
+        Error::Throw(PX_ERROR_ASSET_NOT_AVAILABLE, "No file / stream found for: " + path);
+        return nullptr;
+    }
+
+    std::unique_ptr<std::vector<uint8_t>> data = std::make_unique<std::vector<uint8_t>>();
+    std::istream& _stream = PX_ASTREAM_REF(stream);
+
+    uint8_t b;
+    while (_stream >> b)
+    {
+        data->push_back(b);
+    }
+
+    FT_Face face;
+    FT_Error error;
+
+    error = FT_New_Face(__ft, path.c_str(), 0, &face);
+    if (error)
+    {
+        const char* err = FT_Error_String(error);
+        Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, std::string("Failed to load font: ") + path + " (" + std::string(err ? err : "unknown freetype error") + ":" + std::to_string(error) + ")");
+        return nullptr;
+    }
+
+    FONT fnt = new Font(data, face, size, antialiasing);
+
+    __fonts.insert({ id, fnt });
+
+    return fnt;
+}
+
 TEXTURE px::AssetManager::GetTexture(CREFSTR id)
 {
     if (__textures.count(id) < 1) return nullptr;
@@ -376,4 +441,10 @@ AUDIOBUF px::AssetManager::GetSound(CREFSTR id)
 {
     if (__audio_buffers.count(id) < 1) return nullptr;
     return __audio_buffers.at(id);
+}
+
+FONT px::AssetManager::GetFont(CREFSTR id)
+{
+    if (__fonts.count(id) < 1) return nullptr;
+    return __fonts.at(id);
 }

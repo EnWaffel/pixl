@@ -25,7 +25,7 @@ namespace px
         PX_API Camera(WINDOW window);
 
         PX_API void Update(float delta);
-        PX_API void Draw(DRAWINGCTX ctx, SHADER spriteShader);
+        PX_API void Draw(DRAWINGCTX ctx, SHADER spriteShader, SHADER textShader);
         PX_API void Add(DRAWABLE drawable);
         PX_API void Add(Drawable& drawable);
         PX_API void Remove(DRAWABLE drawable);

@@ -4,8 +4,8 @@
 #include "pixl/utility/Error.h"
 #include "pixl/core/math/Vec2.h"
 #include "pixl/core/math/Mat4.h"
-#include "DrawingContext.h"
-#include "Shader.h"
+#include "pixl/core/graphics/DrawingContext.h"
+#include "pixl/core/graphics/Shader.h"
 
 namespace px
 {
@@ -14,15 +14,15 @@ namespace px
         DRAWINGCTX ctx;
         Mat4 viewMatrix;
         void* data;
-        SHADER shd;
+        SHADER shd; // Sprite Shader
+        SHADER shd1; // Text Shader
+        SHADER shd2;
+        SHADER shd3;
     };
 
     class Drawable
     {
     public:
-        Vec2 pos;
-        Vec2 size;
-        Vec2 scale = Vec2(1.0f, 1.0f);
         bool visible = true;
         bool flipX = false;
         bool flipY = false;
