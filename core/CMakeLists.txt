@@ -37,5 +37,5 @@ src/tween/Easing.cpp
 src/input/KeyCode.cpp
 )
 
-target_include_directories(pixl-core PUBLIC include/ ../utility/include/ ../dependencies/glad/include/ ../dependencies/stb/ ../dependencies/openal-soft/include/ ../dependencies/rapidxml/ ../dependencies/freetype/include/)
+target_include_directories(pixl-core PUBLIC include/ ../utility/include/ ../dependencies/glad/include/ ../dependencies/stb/ ../dependencies/openal-soft/include/ ../dependencies/rapidxml/ ../dependencies/freetype/include/ ../dependencies/utfcpp/source/)
 target_link_libraries(pixl-core PUBLIC pixl-utility glfw OpenAL freetype)
