@@ -1,6 +1,7 @@
 # pixl
 
-![nevergonnagiveyouup](https://img.shields.io/badge/status-active-brightgreen) [![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white)](#) [![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)](#) [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#)
+![nevergonnagiveyouup](https://img.shields.io/badge/status-active-brightgreen) [![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white)](#) [![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)](#) [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#) ![LOC](https://img.shields.io/badge/LOC-0-brightgreen)
+
 
 ## Introduction
 
