@@ -1,0 +1,35 @@
+name: Count Lines of Code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  count_loc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Count lines of code
+      run: |
+        LOC=$(cloc . --json | jq '.SUM.code')
+        echo "LOC count: $LOC"
+
+        # Create badge URL
+        BADGE_URL="https://img.shields.io/badge/LOC-$LOC-brightgreen"
+        echo "Badge URL: $BADGE_URL"
+
+        # Update README with the new badge URL
+        sed -i "s|https://img.shields.io/badge/LOC-[0-9]\+-brightgreen|$BADGE_URL|" README.md
+
+    - name: Commit and push changes
+      uses: EndBug/add-and-commit@v7
+      with:
+        message: 'Update LOC badge'
+        add: 'README.md'
