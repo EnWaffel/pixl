@@ -131,6 +131,11 @@ Error px::AssetManager::Init()
 
 void px::AssetManager::End()
 {
+    for (APKG package : __packages)
+    {
+        AssetPackage::ClosePackage(package);
+    }
+
     for (const auto& v : __textures)
     {
         PX_DEBUG_LOG("AssetManager::End()", "Releasing texture: %s", v.first.c_str());
@@ -404,27 +409,26 @@ FONT px::AssetManager::LoadFont(CREFSTR id, CREFSTR path, uint16_t size, bool an
         return nullptr;
     }
 
-    std::unique_ptr<std::vector<uint8_t>> data = std::make_unique<std::vector<uint8_t>>();
-    std::istream& _stream = PX_ASTREAM_REF(stream);
-
-    uint8_t b;
-    while (_stream >> b)
-    {
-        data->push_back(b);
-    }
+    stream->seekg(0, std::ios::end);
+    uint32_t bufSize = stream->tellg();
+    stream->seekg(0);
+    
+    uint8_t* buf = new uint8_t[bufSize];
+    stream->read(reinterpret_cast<char*>(buf), bufSize);
 
     FT_Face face;
     FT_Error error;
 
-    error = FT_New_Face(__ft, path.c_str(), 0, &face);
+    error = FT_New_Memory_Face(__ft, buf, bufSize, 0, &face);
     if (error)
     {
+        delete[] buf;
         const char* err = FT_Error_String(error);
         Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, std::string("Failed to load font: ") + path + " (" + std::string(err ? err : "unknown freetype error") + ":" + std::to_string(error) + ")");
         return nullptr;
     }
 
-    FONT fnt = new Font(data, face, size, antialiasing);
+    FONT fnt = new Font(buf, face, size, antialiasing);
 
     __fonts.insert({ id, fnt });
 

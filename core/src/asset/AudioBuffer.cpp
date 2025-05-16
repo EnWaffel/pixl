@@ -32,10 +32,13 @@ std::optional<AudioData> px::AudioBuffer::DecodeOGG(std::istream& stream)
     
     if (samples < 0)
     {
+        delete[] buf;
         Error::Throw(PX_ERROR_INVALID_OPERATION, "Failed to decode OGG stream");
         return std::nullopt;
     }
     
+    delete[] buf;
+
     AudioData data{};
     data.channels = channels;
     data.sampleRate = sampleRate;

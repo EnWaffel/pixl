@@ -222,7 +222,7 @@ APKG px::AssetPackage::OpenPackage(CREFSTR path)
     return package;
 }
 
-void px::AssetPackage::ClosePackage(APKG package)
+void px::AssetPackage:: ClosePackage(APKG package)
 {
     if (!package) return;
     delete package;

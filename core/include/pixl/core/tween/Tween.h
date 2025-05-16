@@ -14,6 +14,8 @@ namespace px
     class TweenBase
     {
     public:
+        virtual ~TweenBase() = default;
+
         virtual void Update(float delta) = 0;
         virtual bool IsFinished() = 0;
         virtual bool IsCanceled() = 0;

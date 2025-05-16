@@ -15,6 +15,7 @@ extern px::InitOptions __pixl_opts;
 using namespace px;
 
 extern WINDOW __pixl_rootwnd;
+extern bool __pixl_singlewnd;
 extern void __pixl_timer_update(float delta);
 
 static std::string GetDebugSource(GLenum source)
@@ -105,6 +106,12 @@ namespace px
 #endif
 
             PX_DEBUG_LOG("WindowImpl::WindowImpl()", "Creating window: (parent: 0x%x) title: %s | width: %d | height: %d | startVisible: %s | decorated: %s", parent, title.c_str(), size.x, size.y, startVisible ? "true" : "false", decorated ? "true" : "false");
+            PX_DEBUG_LOG("WindowImpl::WindowImpl()", "Is root window?: %s", !__pixl_rootwnd ? "Yes" : "No");
+
+            if (__pixl_rootwnd)
+            {
+                __pixl_singlewnd = false;
+            }
 
             m_Handle = glfwCreateWindow(size.x, size.y, title.c_str(), NULL, __pixl_rootwnd ? (GLFWwindow*)__pixl_rootwnd->GetHandle() : nullptr);
             if (!m_Handle)
@@ -142,19 +149,19 @@ namespace px
                     Error::Throw(PX_ERROR_OPENGL_LOAD, "Failed to load opengl");
                     return;
                 }
-                
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glEnable(GL_DEBUG_OUTPUT);
-                glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-                glDebugMessageCallback(DebugCallback, nullptr);
-                glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
             }
 
             if (!__pixl_rootwnd)
             {
                 __pixl_rootwnd = parent;
             }
+
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(DebugCallback, nullptr);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT);
@@ -217,7 +224,7 @@ namespace px
 
         void Update(float delta)
         {
-            glfwMakeContextCurrent(m_Handle);
+            if (!__pixl_singlewnd) glfwMakeContextCurrent(m_Handle);
 
             if (__pixl_rootwnd == m_Parent)
             {
@@ -232,12 +239,14 @@ namespace px
 
         void UpdateEvents(float delta)
         {
-            glfwMakeContextCurrent(m_Handle);
+            if (!__pixl_singlewnd) glfwMakeContextCurrent(m_Handle);
             glfwPollEvents();
         }
 
         void Draw()
         {
+            if (!__pixl_singlewnd) glfwMakeContextCurrent(m_Handle);
+
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 

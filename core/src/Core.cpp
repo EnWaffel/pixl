@@ -9,6 +9,7 @@ extern bool __pixl_error_log_errors;
 
 InitOptions __pixl_opts;
 WINDOW __pixl_rootwnd = nullptr;
+bool __pixl_singlewnd = true;
 static std::vector<WINDOW> windows;
 
 Error px::Init(const InitOptions& opts)
