@@ -105,7 +105,7 @@ void px::Text::Draw(const DrawData& data)
         glBindTexture(GL_TEXTURE_2D, g.data);
         data.ctx->DrawQuad();
 
-        offsetX += g.advance.x >> 6 * scale;
+        offsetX += (g.advance.x >> 6) * scale;
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);
