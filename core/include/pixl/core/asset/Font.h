@@ -6,7 +6,6 @@
 
 #include <unordered_map>
 #include <memory>
-#include <vector>
 
 namespace px
 {
@@ -24,22 +23,24 @@ namespace px
     class Font
     {
     public:
-        PX_INTERNAL Font(std::unique_ptr<std::vector<uint8_t>>& d, void* data, uint16_t size, bool antialiasing);
+        PX_INTERNAL Font(void* d, void* data, uint16_t size, bool antialiasing);
         PX_INTERNAL ~Font();
 
         PX_API void LoadChar(UTFChar c, uint16_t size = 0);
-        PX_API Glyph GetCharData(UTFChar c);
+        PX_API const Glyph& GetCharData(UTFChar c);
         PX_API bool HasChar(UTFChar c);
+        PX_API Vec2 GetSize(UTFChar c, float scale = 1.0f);
+        PX_API Vec2 GetSize(const UTFString& str, float scale = 1.0f);
     private:
         void* m_Data;
         uint16_t m_Size;
         bool m_Antialiasing;
         std::unordered_map<UTFChar, Glyph> m_Glyphs;
-        std::unique_ptr<std::vector<uint8_t>> m_D;
+        void* m_D;
     };
 
     typedef Font* FONT;
 
     UTFString ToUTF(CREFSTR str);
-    std::string ToStd(const UTFString& str);
+    std::string FromUTF(const UTFString& str);
 };

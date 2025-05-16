@@ -41,10 +41,13 @@ void px::Text::SetText(const UTFString& text)
 {
     if (!fnt) return;
     m_Text = text;
+    
     for (UTFChar c : text)
     {
         if (!fnt->HasChar(c)) fnt->LoadChar(c);
     }
+
+    size = fnt->GetSize(text, scale);
 }
 
 void px::Text::Center(Axis axis)
@@ -95,14 +98,14 @@ void px::Text::Draw(const DrawData& data)
         float y = pos.y + offsetY - g.bearing.y;
 
         mat.Translate(Vec2(x, y));
-        mat.Scale(g.size);
+        mat.Scale(g.size * scale);
 
         data.shd1->SetMatrix4("model_matrix", mat);
 
         glBindTexture(GL_TEXTURE_2D, g.data);
         data.ctx->DrawQuad();
 
-        offsetX += g.advance.x >> 6;
+        offsetX += g.advance.x >> 6 * scale;
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);
