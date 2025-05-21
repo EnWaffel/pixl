@@ -43,4 +43,4 @@ namespace px
 
     UTFString ToUTF(CREFSTR str);
     std::string FromUTF(const UTFString& str);
-};
+}
