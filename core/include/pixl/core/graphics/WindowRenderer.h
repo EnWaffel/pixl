@@ -2,7 +2,7 @@
 
 #include "pixl/utility/Defs.h"
 #include "pixl/utility/Error.h"
-#include "PipelineElement.h"
+#include "pixl/core/graphics/PipelineElement.h"
 #include "pixl/core/graphics/Shader.h"
 #include "pixl/core/graphics/Framebuffer.h"
 #include "pixl/core/math/Vec2i.h"

@@ -25,6 +25,8 @@ namespace px
 		Color color;
 		Vec2 uvPos;
 		Vec2 uvSize = Vec2(1.0f, 1.0f);
+        bool flipX = false;
+        bool flipY = false;
     public:
         PX_API Sprite();
         PX_API Sprite(TEXTURE tex);

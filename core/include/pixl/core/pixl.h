@@ -40,6 +40,7 @@
 #include "pixl/core/tween/Easing.h"
 #include "pixl/core/graphics/Text.h"
 #include "pixl/core/asset/Font.h"
+#include "pixl/core/graphics/VideoPlayer.h"
 
 #define PX_ERROR_GLFW 0x20
 #define PX_ERROR_SERVICE 0x21

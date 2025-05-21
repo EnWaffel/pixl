@@ -23,6 +23,8 @@ namespace px
 		Color color;
         float scale = 1.0f;
         float lineSpacing = 3.0f;
+        bool flipX = false;
+        bool flipY = false;
     public:
         PX_API Text();
         PX_API Text(FONT fnt, const UTFString& text);

@@ -239,13 +239,13 @@ namespace px
 
         void UpdateEvents(float delta)
         {
-            if (!__pixl_singlewnd) glfwMakeContextCurrent(m_Handle);
+            glfwMakeContextCurrent(m_Handle);
             glfwPollEvents();
         }
 
         void Draw()
         {
-            if (!__pixl_singlewnd) glfwMakeContextCurrent(m_Handle);
+            glfwMakeContextCurrent(m_Handle);
 
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT);

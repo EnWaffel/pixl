@@ -24,10 +24,10 @@ namespace px
     {
     public:
         bool visible = true;
-        bool flipX = false;
-        bool flipY = false;
         int order = -1; // -1 == ignore order (always in the back)
     public:
+        PX_API virtual ~Drawable() = default;
+
         PX_API virtual void Draw(const DrawData& data) = 0;
         PX_API virtual void Update(float delta) = 0;
     };

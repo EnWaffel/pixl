@@ -6,6 +6,7 @@
 using namespace px;
 
 extern bool __pixl_error_log_errors;
+extern void __pixl_vid_destroy_managed();
 
 InitOptions __pixl_opts;
 WINDOW __pixl_rootwnd = nullptr;
@@ -45,6 +46,8 @@ Error px::Init(const InitOptions& opts)
 
 void px::End()
 {
+    __pixl_vid_destroy_managed();
+
     AssetManager::End();
 
     for (WINDOW wnd : windows)
