@@ -9,6 +9,8 @@
 
 #define PX_ERROR 0x90
 #define PX_ERROR_INVALID_OPERATION 0x91
+#define PX_ERROR_INTERNAL 0x92
+#define PX_ERROR_LIB 0x93
 
 namespace px
 {
