@@ -4,6 +4,7 @@
 #include "pixl/utility/Error.h"
 #include "pixl/core/tween/Tween.h"
 #include "pixl/core/math/Vec2.h"
+#include "pixl/core/math/Vec3.h"
 #include "pixl/utility/Color.h"
 
 #include <unordered_map>
@@ -20,6 +21,8 @@ namespace px
         PX_API TW TweenFloat(CREFSTR id, float to, float* ptr, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenVec2(CREFSTR id, const Vec2& from, const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenVec2(CREFSTR id, const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW TweenVec3(CREFSTR id, const Vec3& from, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW TweenVec3(CREFSTR id, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenColor(CREFSTR id, const Color& from, const Color& to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenColor(CREFSTR id, const Color& to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API bool StartTween(CREFSTR id, TW tween);

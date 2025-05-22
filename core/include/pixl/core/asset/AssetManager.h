@@ -6,6 +6,7 @@
 #include "pixl/core/asset/Texture.h"
 #include "pixl/core/asset/AudioBuffer.h"
 #include "pixl/core/asset/Font.h"
+#include "pixl/core/asset/Model.h"
 
 #define PX_ERROR_ASSET_NOT_AVAILABLE 0x40
 #define PX_ERROR_ASSET_LOAD_FAILED 0x41
@@ -33,9 +34,11 @@ namespace px
         PX_API static TEXTURE LoadTexture(CREFSTR id, const ImageData& img, bool antialiasing = true, bool reload = false);
         PX_API static AUDIOBUF LoadSound(CREFSTR id, CREFSTR path, bool reload = false);
         PX_API static FONT LoadFont(CREFSTR id, CREFSTR path, uint16_t size = 24, bool antialiasing = true, bool reload = false);
+        PX_API static MODEL LoadModel(CREFSTR id, CREFSTR path, bool antialiasing = true, bool reload = false);
 
         PX_API static TEXTURE GetTexture(CREFSTR id);
         PX_API static AUDIOBUF GetSound(CREFSTR id);
         PX_API static FONT GetFont(CREFSTR id);
+        PX_API static MODEL GetModel(CREFSTR id);
     };
 }

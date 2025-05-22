@@ -9,22 +9,21 @@
 
 namespace px
 {
-    class __pixl_cam_rend_evt;
+    class __pixl_cam3d_rend_evt;
 
-    class CameraRenderer : public PipelineElement
+    class Camera3DRenderer : public PipelineElement
     {
     public:
-        PX_API CameraRenderer();
-        PX_API ~CameraRenderer();
+        PX_API Camera3DRenderer();
+        PX_API ~Camera3DRenderer();
 
         PX_API void Construct() override;
         PX_API PipelineData Downstream(const PipelineData& data) override;
     private:
-        SHADER m_SpriteShader;
-        SHADER m_TextShader;
+        SHADER m_ObjectShader;
         FRAMEBUF m_Framebuf;
         Vec2i m_ViewportSize;
 
-        friend class __pixl_cam_rend_evt;
+        friend class __pixl_cam3d_rend_evt;
     };
 }

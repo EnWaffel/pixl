@@ -76,7 +76,7 @@ namespace px
             obj->m_ViewportSize = _data.viewportSize;
 
             delete obj->m_Framebuf;
-            obj->m_Framebuf = new Framebuffer(_data.viewportSize, true);            
+            obj->m_Framebuf = new Framebuffer(_data.viewportSize, true);
 
             return true;
         }
@@ -111,6 +111,8 @@ void px::CameraRenderer::Construct()
 
 PipelineData px::CameraRenderer::Downstream(const PipelineData& data)
 {
+    if (!data.camera) return data;
+
     m_Framebuf->Bind();
 
     glViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);

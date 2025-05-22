@@ -62,6 +62,32 @@ TW px::Tweenable::TweenVec2(CREFSTR id, const Vec2& to, Vec2* ptr, float duratio
     return t;
 }
 
+TW px::Tweenable::TweenVec3(CREFSTR id, const Vec3& from, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Vec3>(from, to, ptr, duration, easing, delay, callback);
+    
+    if (!StartTween(id, t))
+    {
+        delete t;
+        return nullptr;
+    }
+
+    return t;
+}
+
+TW px::Tweenable::TweenVec3(CREFSTR id, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Vec3>(to, ptr, duration, easing, delay, callback);
+    
+    if (!StartTween(id, t))
+    {
+        delete t;
+        return nullptr;
+    }
+
+    return t;
+}
+
 TW px::Tweenable::TweenColor(CREFSTR id, const Color& from, const Color &to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<Color>(from, to, ptr, duration, easing, delay, callback);

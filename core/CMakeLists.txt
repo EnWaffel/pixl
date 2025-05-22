@@ -37,7 +37,28 @@ src/tween/Easing.cpp
 src/input/KeyCode.cpp
 src/asset/Font.cpp
 src/graphics/Text.cpp
+src/asset/Model.cpp
+src/graphics/Camera3DRenderer.cpp
+src/graphics/Camera3D.cpp
+src/graphics/VideoPlayer.cpp
 )
 
-target_include_directories(pixl-core PUBLIC include/ ../utility/include/ ../dependencies/glad/include/ ../dependencies/stb/ ../dependencies/openal-soft/include/ ../dependencies/rapidxml/ ../dependencies/freetype/include/ ../dependencies/utfcpp/source/)
-target_link_libraries(pixl-core PUBLIC pixl-utility glfw OpenAL freetype)
+target_include_directories(pixl-core PUBLIC
+include/
+../utility/include/
+../dependencies/glad/include/
+../dependencies/stb/
+../dependencies/openal-soft/include/
+../dependencies/rapidxml/
+../dependencies/freetype/include/
+../dependencies/utfcpp/source/
+../dependencies/assimp/include/
+../dependencies/libav/include/
+)
+
+if(WIN32)
+target_link_directories(pixl-core PUBLIC ../dependencies/libav/lib/)
+target_link_libraries(pixl-core PUBLIC pixl-utility glfw OpenAL freetype assimp avcodec avdevice avfilter avformat avutil swresample swscale)
+else()
+target_link_libraries(pixl-core PUBLIC pixl-utility glfw OpenAL freetype assimp avcodec avdevice avfilter avformat avutil swresample swscale)
+endif()

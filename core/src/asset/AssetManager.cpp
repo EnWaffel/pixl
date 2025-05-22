@@ -23,6 +23,7 @@ static FT_Library __ft = nullptr;
 static std::unordered_map<std::string, TEXTURE> __textures;
 static std::unordered_map<std::string, AUDIOBUF> __audio_buffers;
 static std::unordered_map<std::string, FONT> __fonts;
+static std::unordered_map<std::string, MODEL> __models;
 
 static bool EndsWith(CREFSTR filename, CREFSTR ext) {
     if (filename.length() < ext.length()) return false;
@@ -151,6 +152,12 @@ void px::AssetManager::End()
     for (const auto& v : __fonts)
     {
         PX_DEBUG_LOG("AssetManager::End()", "Releasing font: %s", v.first.c_str());
+        delete v.second;
+    }
+
+    for (const auto& v : __models)
+    {
+        PX_DEBUG_LOG("AssetManager::End()", "Releasing model: %s", v.first.c_str());
         delete v.second;
     }
 
@@ -435,6 +442,37 @@ FONT px::AssetManager::LoadFont(CREFSTR id, CREFSTR path, uint16_t size, bool an
     return fnt;
 }
 
+MODEL px::AssetManager::LoadModel(CREFSTR id, CREFSTR path, bool antialiasing, bool reload)
+{
+    if (__models.count(id) > 0 && !reload)
+    {
+        return __models.at(id);
+    }
+    else if (__models.count(id) > 0 && reload)
+    {
+        delete __models.at(id);
+        __models.erase(id);
+    }
+
+    std::unique_ptr<std::istream> stream = GetStream(path);
+    if (!stream)
+    {
+        Error::Throw(PX_ERROR_ASSET_NOT_AVAILABLE, "No file / stream found for: " + path);
+        return nullptr;
+    }
+    
+    MODEL model = Model::Load(id, PX_ASTREAM_REF(stream));
+    if (!model)
+    {
+        Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, "Failed to load model: " + path);
+        return nullptr;
+    }
+
+    __models.insert({ id, model });
+
+    return model;
+}
+
 TEXTURE px::AssetManager::GetTexture(CREFSTR id)
 {
     if (__textures.count(id) < 1) return nullptr;
@@ -451,4 +489,10 @@ FONT px::AssetManager::GetFont(CREFSTR id)
 {
     if (__fonts.count(id) < 1) return nullptr;
     return __fonts.at(id);
+}
+
+MODEL px::AssetManager::GetModel(CREFSTR id)
+{
+    if (__models.count(id) < 1) return nullptr;
+    return __models.at(id);
 }

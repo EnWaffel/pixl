@@ -3,9 +3,10 @@
 #include "pixl/utility/Defs.h"
 #include "pixl/utility/Error.h"
 #include "pixl/core/math/Vec2.h"
-#include "Camera.h"
-#include "DrawingContext.h"
-#include "Framebuffer.h"
+#include "pixl/core/graphics/Camera.h"
+#include "pixl/core/graphics/Camera3D.h"
+#include "pixl/core/graphics/DrawingContext.h"
+#include "pixl/core/graphics/Framebuffer.h"
 
 namespace px
 {
@@ -13,6 +14,7 @@ namespace px
     {
         DRAWINGCTX ctx = nullptr;
         CAMERA camera = nullptr;
+        CAMERA3D camera3d = nullptr;
         bool final = false;
         FRAMEBUF prevBuf = nullptr;
     };

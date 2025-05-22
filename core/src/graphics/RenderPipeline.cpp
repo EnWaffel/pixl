@@ -106,6 +106,24 @@ namespace px
 
         void Flush()
         {
+            /*
+            for (CAMERA3D camera : m_Wnd->GetCameras())
+            {
+                PipelineData data{};
+                data.camera = nullptr;
+                data.camera3d = camera;
+                data.ctx = m_Wnd->GetDrawingContext();
+                
+                for (auto& pair : m_Elements)
+                {
+                    PIPEELEMENT e = pair.second;
+                    data.final = pair == m_Elements.back();
+
+                    data = e->Downstream(data);
+                }
+            }
+            */
+            
             for (CAMERA camera : m_Wnd->GetCameras())
             {
                 PipelineData data{};
@@ -120,7 +138,6 @@ namespace px
                     data = e->Downstream(data);
                 }
             }
-
         }
     };
 };

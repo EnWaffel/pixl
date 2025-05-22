@@ -13,3 +13,6 @@ if (WIN32)
 add_subdirectory(dependencies/glfw)
 endif()
 add_subdirectory(dependencies/freetype)
+add_subdirectory(dependencies/assimp)
+
+add_subdirectory(test)
