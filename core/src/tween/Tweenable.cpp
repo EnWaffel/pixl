@@ -173,7 +173,7 @@ void px::Tweenable::UpdateTweens(float delta)
     }
 }
 
-void px::Tweenable::CancelAll()
+void px::Tweenable::CancelAllTweens()
 {
     m_DoCancelAll = true;
 }

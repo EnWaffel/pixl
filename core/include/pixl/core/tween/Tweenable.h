@@ -28,7 +28,7 @@ namespace px
         PX_API bool StartTween(CREFSTR id, TW tween);
         PX_API void CancelTween(CREFSTR id);
         PX_API void UpdateTweens(float delta);
-        PX_API void CancelAll();
+        PX_API void CancelAllTweens();
     protected:
         std::unordered_map<std::string, TweenBase*> m_Tweens;
         std::queue<std::string> m_CancelQueue;
