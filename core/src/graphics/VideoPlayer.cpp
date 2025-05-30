@@ -442,6 +442,11 @@ namespace px
 
         Frame& GetFrame()
         {
+            if (m_TexturesRenderedIndex >= m_TexturesCount)
+            {
+                return (Frame&)m_RenderingTextures[m_TexturesCount - 1];
+            }
+
             return (Frame&)m_RenderingTextures[m_TexturesRenderedIndex];
         }
     };
@@ -870,5 +875,20 @@ VIDPLAYER px::VideoPlayer::Create(CREFSTR path, bool managed, uint8_t frameBuffe
 
 void px::VideoPlayer::Destroy(VIDPLAYER player)
 {
+    int i = -1;
+    for (VIDPLAYER plr : __pixl_vid_managed)
+    {
+        if (i < 0) i = 0;
+
+        if (plr == player)
+        {
+            break;
+        }
+
+        i++;
+    }
+
+    if (i >= 0) __pixl_vid_managed.erase(__pixl_vid_managed.begin() + i);
+
     delete player;
 }
