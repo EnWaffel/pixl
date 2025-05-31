@@ -8,6 +8,7 @@
 #include <AL/alc.h>
 #include <unordered_map>
 #include <vector>
+#include <array>
 
 using namespace px;
 
@@ -15,6 +16,7 @@ static ALCcontext* __context;
 static ALCdevice* __device;
 static std::unordered_map<std::string, SNDGROUP> __groups;
 static std::vector<SOUND> __temp_sounds;
+static std::unordered_map<SOUND, SOUND> __sounds;
 float __pixl_global_volume = 1.0f;
 
 SNDGROUP px::SoundSystem::DEFAULT_GROUP = nullptr;
@@ -68,13 +70,23 @@ void px::SoundSystem::End()
 
 void px::SoundSystem::Update(float delta)
 {
+    std::array<int, 256> finishedTempSounds;
+    int i = 0;
+
     for (SOUND snd : __temp_sounds)
     {
-        
+        if (snd->IsPlaying()) continue;
+        finishedTempSounds[i] = i;
+        i++;
+    }
+
+    for (int idx : finishedTempSounds)
+    {
+        __temp_sounds.erase(__temp_sounds.begin() + idx);
     }
 }
 
-void px::SoundSystem::PlaySound(AUDIOBUF buffer, float volume, CREFSTR group)
+void px::SoundSystem::PlaySound(AUDIOBUF buffer, float volume, float pitch, CREFSTR group)
 {
     if (!buffer) return;
 
@@ -83,24 +95,37 @@ void px::SoundSystem::PlaySound(AUDIOBUF buffer, float volume, CREFSTR group)
 
     SOUND snd = new Sound(buffer, _group, true);
     __temp_sounds.push_back(snd);
-
+    
     snd->SetVolume(volume);
+    snd->SetPitch(pitch);
     snd->Play();
 }
 
-void px::SoundSystem::PlaySound(CREFSTR id, float volume, CREFSTR group)
+void px::SoundSystem::PlaySound(CREFSTR id, float volume, float pitch, CREFSTR group)
 {
-    PlaySound(AssetManager::GetSound(id), volume, group);
+    PlaySound(AssetManager::GetSound(id), volume, pitch, group);
 }
 
 SOUND px::SoundSystem::CreateSound(AUDIOBUF buffer, float volume, CREFSTR group)
 {
-    return new Sound(buffer, GetGroup(group), false);
+    SOUND snd = new Sound(buffer, GetGroup(group), false);
+    __sounds.insert({ snd, snd });
+    return snd;
 }
 
 SOUND px::SoundSystem::CreateSound(CREFSTR id, float volume, CREFSTR group)
 {
-    return new Sound(AssetManager::GetSound(id), GetGroup(group), false);
+    SOUND snd = new Sound(AssetManager::GetSound(id), GetGroup(group), false);
+    __sounds.insert({ snd, snd });
+    return snd;
+}
+
+void px::SoundSystem::DestroySound(SOUND snd)
+{
+    if (__sounds.count(snd) < 1) return;
+    snd->Stop();
+    __sounds.erase(snd);
+    delete snd;
 }
 
 void px::SoundSystem::CreateGroup(CREFSTR id, float volume)
@@ -133,10 +158,40 @@ void px::SoundSystem::UpdateVolume()
     {
         alSourcef(snd->m_Data, AL_GAIN, snd->m_Volume * snd->m_Group->volume * __pixl_global_volume);
     }
+
+    for (auto& v : __sounds)
+    {
+        alSourcef(v.second->m_Data, AL_GAIN, v.second->m_Volume * v.second->m_Group->volume * __pixl_global_volume);
+    }
 }
 
 void px::SoundSystem::SetGlobalVolume(float volume)
 {
     __pixl_global_volume = volume;
     UpdateVolume();
+}
+
+void px::SoundSystem::SetListenerPosition(const Vec3& pos)
+{
+    alListenerfv(AL_POSITION, (ALfloat*)&pos);
+}
+
+void px::SoundSystem::SetListenerPosition(const Vec2& pos)
+{
+    SetListenerPosition(Vec3(pos.x, pos.y, 0.0f));
+}
+
+void px::SoundSystem::SetListenerVelocity(const Vec3& vel)
+{
+    alListenerfv(AL_VELOCITY, (ALfloat*)&vel);
+}
+
+void px::SoundSystem::SetListenerVelocity(const Vec2& vel)
+{
+    SetListenerVelocity(Vec3(vel.x, vel.y, 0.0f));
+}
+
+void px::SoundSystem::SetListenerOrientation(const ListenerOrientation& orientation)
+{
+    alListenerfv(AL_ORIENTATION, (float*)&orientation);
 }

@@ -7,8 +7,10 @@ using namespace px;
 
 extern float __pixl_global_volume;
 
-px::Sound::Sound(AUDIOBUF buffer, SNDGROUP group, bool temp) : m_Buffer(buffer), m_Group(group), m_Volume(1.0f), m_Temp(temp)
+px::Sound::Sound(AUDIOBUF buffer, SNDGROUP group, bool temp) : m_Buffer(buffer), m_Volume(1.0f), m_Temp(temp)
 {
+    m_Group = group;
+
     alGenSources(1, &m_Data);
     alSourcei(m_Data, AL_BUFFER, buffer->m_Data.size);
     if (temp)
@@ -59,9 +61,43 @@ void px::Sound::SetVolume(float volume)
     }
 }
 
+void px::Sound::SetPitch(float pitch)
+{
+    alSourcef(m_Data, AL_PITCH, pitch);
+}
+
 float px::Sound::GetTimePosition()
 {
     ALint samples = 0;
     alGetSourcei(m_Data, AL_SAMPLE_OFFSET, &samples);
     return ((float)samples * 1000.0f) / m_Buffer->m_Data.sampleRate;
+}
+
+bool px::Sound::IsPlaying()
+{
+    ALint state;
+    alGetSourcei(m_Data, AL_SOURCE_STATE, &state);
+    return state == AL_PLAYING;
+}
+
+void px::Sound::SetPosition(const Vec3& pos)
+{
+    alSourcefv(m_Data, AL_POSITION, (ALfloat*)&pos);
+}
+
+void px::Sound::SetVelocity(const Vec3& vel)
+{
+    alSourcefv(m_Data, AL_VELOCITY, (ALfloat*)&vel);
+}
+
+void px::Sound::SetDirection(const Vec3& direction)
+{
+    alSourcefv(m_Data, AL_DIRECTION, (ALfloat*)&direction);
+}
+
+void px::Sound::SetCone(const DirectionCone& cone)
+{
+    alSourcef(m_Data, AL_CONE_INNER_ANGLE, cone.innerAngle);
+    alSourcef(m_Data, AL_CONE_OUTER_ANGLE, cone.outerAngle);
+    alSourcef(m_Data, AL_CONE_OUTER_GAIN, cone.outerGain);
 }
