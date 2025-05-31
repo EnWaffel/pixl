@@ -84,6 +84,11 @@ void px::Sprite::Center(Axis axis, const Vec2& parentSize)
 	}
 }
 
+ANIM* px::Sprite::GetAnimation(CREFSTR name)
+{
+    return &m_CurAnim;
+}
+
 void px::Sprite::Draw(const DrawData& data)
 {
     data.shd->Use();
@@ -124,6 +129,8 @@ void px::Sprite::Draw(const DrawData& data)
 
 void px::Sprite::Update(float delta)
 {
+	UpdateTweens(delta);
+
     if (m_CurAnim && tex)
 	{
 		m_CurAnim.Update(delta);

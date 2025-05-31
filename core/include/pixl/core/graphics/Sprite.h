@@ -40,6 +40,7 @@ namespace px
         PX_API void SetDefaultAnimation(CREFSTR name);
         PX_API void Center(Axis axis);
         PX_API void Center(Axis axis, const Vec2& parentSize);
+        PX_API ANIM* GetAnimation(CREFSTR name);
 
         PX_API void Draw(const DrawData& data) override;
         PX_API void Update(float delta) override;
