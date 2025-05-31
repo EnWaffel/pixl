@@ -454,6 +454,7 @@ namespace px
     class AudioHandler {
     public:
         bool m_Paused = false;
+        double m_Time = 0;
     private:
         AVFrameProvider* m_FrameProvider;
 
@@ -469,7 +470,6 @@ namespace px
 
         ALuint m_Buffers[AUDIO_BUFFER_COUNT];
         ALuint m_Source;
-
     public:
         AudioHandler(AVFormatContext* fmtCtx, AVCodecContext* ctx, AVStream* stream, AVFrameProvider* frameProvider) : m_FrameProvider(frameProvider), m_FmtCtx(fmtCtx), m_Ctx(ctx), m_Stream(stream)
         {
@@ -569,6 +569,11 @@ namespace px
             while (processed-- > 0) {
                 ALuint buf;
                 alSourceUnqueueBuffers(m_Source, 1, &buf);
+
+                ALint size;
+                alGetBufferi(buf, AL_SIZE, &size);
+                m_Time += (double)size / (2.0 * 2.0 * 44100.0); // size / (channels * sample size in bytes * sample rate)
+                
                 DecodeAudio(buf);
                 alSourceQueueBuffers(m_Source, 1, &buf);
             }
@@ -603,8 +608,6 @@ namespace px
         AVFrameProvider* m_FrameProvider;
         FrameHandler* m_FrameHandler;
         AudioHandler* m_AudioHandler;
-        double m_StartTime;
-        double m_PastTime;
         double m_PlaybackClock;
         bool m_Playing = false;
         bool m_Stopped = false;
@@ -638,8 +641,7 @@ namespace px
             if (m_Stopped) return;
             if (!m_Playing) return;
 
-            double now = NOW();
-            m_PlaybackClock = m_PastTime + (now - m_StartTime);
+            m_PlaybackClock = m_AudioHandler->m_Time;
         
             if (m_PlaybackClock >= m_Duration)
             {
@@ -654,7 +656,7 @@ namespace px
 
         void Draw(const Mat4& mat, const DrawData& data)
         {
-            if (m_Stopped || !m_Playing) return;
+            if (m_Stopped) return;
 
             Frame& frame = m_FrameHandler->GetFrame();
             GLuint tex = frame.tex;
@@ -683,9 +685,7 @@ namespace px
         void Play()
         {
             if (m_Stopped) return;
-            m_StartTime = NOW();
             m_PlaybackClock = 0.0;
-            m_PastTime = 0.0;
             m_Playing = true;
             m_AudioHandler->Start();
         }
@@ -693,7 +693,6 @@ namespace px
         void Pause()
         {
             if (m_Stopped) return;
-            m_PastTime += NOW() - m_StartTime;
             m_Playing = false;
             m_AudioHandler->Pause();
         }
@@ -701,7 +700,6 @@ namespace px
         void Resume()
         {
             if (m_Stopped) return;
-            m_StartTime = NOW();
             m_Playing = true;
             m_AudioHandler->Start();
         }
