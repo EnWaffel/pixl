@@ -4,6 +4,7 @@
 
 namespace px
 {
+#pragma pack(push, 1)
     class Vec3
 	{
 	public:
@@ -44,4 +45,5 @@ namespace px
 
 		PX_API float Distance(const Vec3& other);
 	};
+#pragma pack(pop)
 }
