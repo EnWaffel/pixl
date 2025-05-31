@@ -177,7 +177,7 @@ void px::AssetManager::SetPreferPackages(bool flag)
 
 std::unique_ptr<std::istream> px::AssetManager::GetStream(CREFSTR path)
 {
-    return std::move(_GetStream(path));
+    return _GetStream(path);
 }
 
 TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing, bool reload)
