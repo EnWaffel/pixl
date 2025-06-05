@@ -4,9 +4,10 @@ project(pixl-core VERSION 0.0.1)
 
 add_compile_options(-Wall)
 add_compile_definitions(-DPX_EXPORTS)
+add_compile_definitions(-DPX_DEBUG)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 
-add_library(pixl-core SHARED
+set(SRC
 src/Core.cpp
 src/math/Vec2i.cpp
 src/window/Window.cpp
@@ -37,11 +38,22 @@ src/tween/Easing.cpp
 src/input/KeyCode.cpp
 src/asset/Font.cpp
 src/graphics/Text.cpp
-src/asset/Model.cpp
-src/graphics/Camera3DRenderer.cpp
-src/graphics/Camera3D.cpp
-src/graphics/VideoPlayer.cpp
+src/graphics/SpriteGroup.cpp
 )
+
+if(PX_VIDEO)
+    list(APPEND SRC src/graphics/VideoPlayer.cpp)
+endif()
+
+if(PX_3D)
+    list(APPEND SRC
+        src/asset/Model.cpp
+        src/graphics/Camera3DRenderer.cpp
+        src/graphics/Camera3D.cpp
+    )
+endif()
+
+add_library(pixl-core SHARED ${SRC})
 
 target_include_directories(pixl-core PUBLIC
 include/
@@ -57,8 +69,51 @@ include/
 )
 
 if(WIN32)
-target_link_directories(pixl-core PUBLIC ../dependencies/libav/lib/)
-target_link_libraries(pixl-core PUBLIC pixl-utility glfw OpenAL freetype assimp avcodec avdevice avfilter avformat avutil swresample swscale)
+    target_link_directories(pixl-core PUBLIC ../dependencies/libav/lib/release/ ../dependencies/freetype/lib/release/)
+    set(LIBS
+    pixl-utility
+    glfw
+    OpenAL
+    freetype
+    kernel32
+    user32
+    gdi32
+    winspool
+    shell32
+    ole32
+    oleaut32
+    uuid
+    comdlg32
+    advapi32
+    ws2_32
+    Mfplat
+    Mfuuid
+    Secur32
+    Bcrypt
+    strmiids
+    brotlidec
+    brotlienc
+    brotlicommon
+    bz2
+    png16
+    zlib
+    )
 else()
-target_link_libraries(pixl-core PUBLIC pixl-utility glfw OpenAL freetype assimp avcodec avdevice avfilter avformat avutil swresample swscale)
+    set(LIBS
+    pixl-utility
+    glfw
+    OpenAL
+    freetype
+    )
+    
 endif()
+
+if(PX_VIDEO)
+    list(APPEND LIBS avcodec avdevice avfilter avformat avutil swresample swscale)
+endif()
+
+if(PX_3D)
+    list(APPEND LIBS assimp)
+endif()
+
+target_link_libraries(pixl-core PUBLIC ${LIBS})
