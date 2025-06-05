@@ -33,14 +33,15 @@ namespace px
         PX_API void Remove(Drawable& drawable);
         PX_API void Reorder();
 
-        PX_API TW TweenFOV(CREFSTR id, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenFOV(CREFSTR id, float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenFOV(float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenFOV(float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenPos(CREFSTR id, const Vec3& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenPos(CREFSTR id, const Vec3& from, const Vec3&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenPos(const Vec3& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenPos(const Vec3& from, const Vec3& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW TweenPos(const Vec3& from, const Vec3&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+
+        PX_API TW QueueTweenFOV(float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenFOV(float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenPos(const Vec3& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenPos(const Vec3& from, const Vec3&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
     private:
         PX_INTERNAL Mat4 CalculateViewMatrix();
     private:

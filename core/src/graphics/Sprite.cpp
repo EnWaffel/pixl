@@ -57,6 +57,16 @@ void px::Sprite::PlayAnimation(CREFSTR name)
 	m_CurAnimName = name;
 	m_CurAnim.Play();
 	m_CurAnim.Update(0.0f);
+
+	AnimationFrame& frame = m_CurAnim.GetCurrentFrame();
+	tex = frame.tex;
+	uvPos = frame.uvPos;
+	uvSize = frame.uvSize;
+	offset = frame.offset + m_AnimOffsets.at(m_CurAnimName);
+	size.x = frame.uvSize.x * tex->GetWidth();
+	size.y = frame.uvSize.y * tex->GetHeight();
+	rotation = frame.rotation;
+
 }
 
 void px::Sprite::SetDefaultAnimation(CREFSTR name)
@@ -86,7 +96,22 @@ void px::Sprite::Center(Axis axis, const Vec2& parentSize)
 
 ANIM* px::Sprite::GetAnimation(CREFSTR name)
 {
-    return &m_CurAnim;
+	for (auto& v : m_Animations)
+	{
+		if (v.first == name) return &v.second;
+	}
+
+	return nullptr;
+}
+
+ANIM* px::Sprite::GetCurrentAnimation()
+{
+	return &m_CurAnim;
+}
+
+CREFSTR px::Sprite::GetCurrentAnimationName()
+{
+	return m_CurAnimName;
 }
 
 void px::Sprite::Draw(const DrawData& data)
@@ -94,6 +119,8 @@ void px::Sprite::Draw(const DrawData& data)
     data.shd->Use();
 
     Vec2 _pos = pos;
+	_pos.x -= data.offset.x * scrollFactor.x;
+	_pos.y -= data.offset.y * scrollFactor.y;
 
 	Mat4 mat;
 	Vec2 diff = Vec2((size.x * scale.x) - size.x, (size.y * scale.y) - size.y);
@@ -136,17 +163,30 @@ void px::Sprite::Update(float delta)
 		m_CurAnim.Update(delta);
 		if (m_CurAnim.IsFinished())
 		{
+			if (m_CurAnim.IsResetOnFinish())
+			{
+				tex = nullptr;
+				uvPos = Vec2();
+				uvSize = Vec2(1.0f);
+				offset = Vec2();
+				size = Vec2();
+				rotation = 0.0f;
+			}
+
 			m_CurAnim = ANIM();
 			m_CurAnimName.clear();
+
 			if (!m_DefAnim.empty())
 			{
 				PlayAnimation(m_DefAnim);
 			}
+
 			return;
 		}
 
 		AnimationFrame& frame = m_CurAnim.GetCurrentFrame();
 
+		tex = frame.tex;
 		uvPos = frame.uvPos;
 		uvSize = frame.uvSize;
 		offset = frame.offset + m_AnimOffsets.at(m_CurAnimName);
@@ -156,98 +196,84 @@ void px::Sprite::Update(float delta)
 	}
 }
 
-TW px::Sprite::TweenPos(CREFSTR id, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    return TweenVec2(id, to, &pos, duration, easing, delay, callback);
-}
-
-TW px::Sprite::TweenPos(CREFSTR id, const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    return TweenVec2(id, from, to, &pos, duration, easing, delay, callback);
-}
-
 TW px::Sprite::TweenPos(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
-    CancelTween("pos");
-    UpdateTweens(0.0f);
-    return TweenVec2("pos", to, &pos, duration, easing, delay, callback);
+    return TweenVec2(to, &pos, duration, easing, delay, callback);
 }
 
 TW px::Sprite::TweenPos(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
-    CancelTween("pos");
-    UpdateTweens(0.0f);
-    return TweenVec2("pos", from, to, &pos, duration, easing, delay, callback);
-}
-
-TW px::Sprite::TweenSize(CREFSTR id, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    return TweenVec2(id, to, &size, duration, easing, delay, callback);
-}
-
-TW px::Sprite::TweenSize(CREFSTR id, const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    return TweenVec2(id, from, to, &size, duration, easing, delay, callback);
+    return TweenVec2(from, to, &pos, duration, easing, delay, callback);
 }
 
 TW px::Sprite::TweenSize(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
-    CancelTween("size");
-    UpdateTweens(0.0f);
-    return TweenVec2("size", to, &size, duration, easing, delay, callback);
+    return TweenVec2(to, &size, duration, easing, delay, callback);
 }
 
 TW px::Sprite::TweenSize(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
-    CancelTween("size");
-    UpdateTweens(0.0f);
-    return TweenVec2("size", from, to, &size, duration, easing, delay, callback);
-}
-
-TW px::Sprite::TweenScale(CREFSTR id, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    return TweenVec2(id, to, &scale, duration, easing, delay, callback);
-}
-
-TW px::Sprite::TweenScale(CREFSTR id, const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    return TweenVec2(id, from, to, &scale, duration, easing, delay, callback);
+    return TweenVec2(from, to, &size, duration, easing, delay, callback);
 }
 
 TW px::Sprite::TweenScale(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
-    CancelTween("scale");
-    UpdateTweens(0.0f);
-    return TweenVec2("scale", to, &scale, duration, easing, delay, callback);
+    return TweenVec2(to, &scale, duration, easing, delay, callback);
 }
 
 TW px::Sprite::TweenScale(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
-    CancelTween("scale");
-    UpdateTweens(0.0f);
-    return TweenVec2("scale", from, to, &scale, duration, easing, delay, callback);
+    return TweenVec2(from, to, &scale, duration, easing, delay, callback);
 }
 
-TW px::Sprite::TweenRotation(CREFSTR id, float to, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback &callback)
+TW px::Sprite::TweenRotation(float to, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback &callback)
 {
-    return TweenFloat(id, to, &rotation, duration, easing, delay, callback);
-}
-
-TW px::Sprite::TweenRotation(CREFSTR id, float from, float to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    return TweenFloat(id, from, to, &rotation, duration, easing, delay, callback);
-}
-
-TW px::Sprite::TweenRotation(float to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
-{
-    CancelTween("rotation");
-    UpdateTweens(0.0f);
-    return TweenFloat("rotation", to, &rotation, duration, easing, delay, callback);
+    return TweenFloat(to, &rotation, duration, easing, delay, callback);
 }
 
 TW px::Sprite::TweenRotation(float from, float to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
-    CancelTween("rotation");
-    UpdateTweens(0.0f);
-    return TweenFloat("rotation", from, to, &rotation, duration, easing, delay, callback);
+    return TweenFloat(from, to, &rotation, duration, easing, delay, callback);
+}
+
+// Queued tweens
+
+TW px::Sprite::QueueTweenPos(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return QueueTweenVec2(to, &pos, duration, easing, delay, callback);
+}
+
+TW px::Sprite::QueueTweenPos(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return QueueTweenVec2(from, to, &pos, duration, easing, delay, callback);
+}
+
+TW px::Sprite::QueueTweenSize(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return QueueTweenVec2(to, &size, duration, easing, delay, callback);
+}
+
+TW px::Sprite::QueueTweenSize(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return QueueTweenVec2(from, to, &size, duration, easing, delay, callback);
+}
+
+TW px::Sprite::QueueTweenScale(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return QueueTweenVec2(to, &scale, duration, easing, delay, callback);
+}
+
+TW px::Sprite::QueueTweenScale(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return QueueTweenVec2(from, to, &scale, duration, easing, delay, callback);
+}
+
+TW px::Sprite::QueueTweenRotation(float to, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback &callback)
+{
+    return QueueTweenFloat(to, &rotation, duration, easing, delay, callback);
+}
+
+TW px::Sprite::QueueTweenRotation(float from, float to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    return QueueTweenFloat(from, to, &rotation, duration, easing, delay, callback);
 }

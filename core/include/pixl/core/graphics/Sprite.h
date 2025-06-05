@@ -16,15 +16,15 @@ namespace px
     public:
         Vec2 pos;
         Vec2 size;
-        Vec2 scale = Vec2(1.0f, 1.0f);
+        Vec2 scale = Vec2(1.0f);
         Vec2 offset;
-        Vec2 pivotPoint = Vec2(0.5f, 0.5f);
+        Vec2 pivotPoint = Vec2(0.5f);
         float rotation = 0.0f;
-        Vec2 scrollFactor;
-		TEXTURE tex;
+        Vec2 scrollFactor = Vec2(1.0f);
+		TEXTURE tex = nullptr;
 		Color color;
 		Vec2 uvPos;
-		Vec2 uvSize = Vec2(1.0f, 1.0f);
+		Vec2 uvSize = Vec2(1.0f);
         bool flipX = false;
         bool flipY = false;
     public:
@@ -41,28 +41,31 @@ namespace px
         PX_API void Center(Axis axis);
         PX_API void Center(Axis axis, const Vec2& parentSize);
         PX_API ANIM* GetAnimation(CREFSTR name);
+        PX_API ANIM* GetCurrentAnimation();
+        PX_API CREFSTR GetCurrentAnimationName();
 
         PX_API void Draw(const DrawData& data) override;
         PX_API void Update(float delta) override;
 
         // You could call this a Twon of functions! ;-)
 
-        PX_API TW TweenPos(CREFSTR id, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenPos(CREFSTR id, const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenPos(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenPos(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenSize(CREFSTR id, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenSize(CREFSTR id, const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW TweenPos(const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenSize(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenSize(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenScale(CREFSTR id, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenScale(CREFSTR id, const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW TweenSize(const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenScale(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenScale(const Vec2& from, const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenRotation(CREFSTR id, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
-        PX_API TW TweenRotation(CREFSTR id, float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW TweenScale(const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenRotation(float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenRotation(float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+
+        PX_API TW QueueTweenPos(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenPos(const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenSize(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenSize(const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenScale(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenScale(const Vec2& from, const Vec2&  to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenRotation(float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
+        PX_API TW QueueTweenRotation(float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
     private:
         std::unordered_map<std::string, ANIM> m_Animations;
         std::unordered_map<std::string, Vec2> m_AnimOffsets;

@@ -34,11 +34,23 @@ namespace px
         PX_API static TEXTURE LoadTexture(CREFSTR id, const ImageData& img, bool antialiasing = true, bool reload = false);
         PX_API static AUDIOBUF LoadSound(CREFSTR id, CREFSTR path, bool reload = false);
         PX_API static FONT LoadFont(CREFSTR id, CREFSTR path, uint16_t size = 24, bool antialiasing = true, bool reload = false);
+#ifdef PX_3D
         PX_API static MODEL LoadModel(CREFSTR id, CREFSTR path, bool antialiasing = true, bool reload = false);
+#endif
 
         PX_API static TEXTURE GetTexture(CREFSTR id);
         PX_API static AUDIOBUF GetSound(CREFSTR id);
         PX_API static FONT GetFont(CREFSTR id);
+#ifdef PX_3D
         PX_API static MODEL GetModel(CREFSTR id);
+#endif
+
+        PX_API static void ReleaseTexturesWithPrefix(CREFSTR prefix);
+        PX_API static void ReleaseSoundsWithPrefix(CREFSTR prefix);
+        PX_API static void ReleaseFontsWithPrefix(CREFSTR prefix);
+#ifdef PX_3D
+        PX_API static void ReleaseModelsWithPrefix(CREFSTR prefix);
+#endif
+        PX_API static void ReleaseAllWithPrefix(CREFSTR prefix);
     };
 }

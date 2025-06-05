@@ -17,7 +17,7 @@ px::Vec2::Vec2(float v) : x(v), y(v)
 {
 }
 
-Vec2 px::Vec2::operator+(const Vec2 &other)
+Vec2 px::Vec2::operator+(const Vec2& other)
 {
     return Vec2(x + other.x, y + other.y);
 }

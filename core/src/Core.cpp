@@ -6,7 +6,9 @@
 using namespace px;
 
 extern bool __pixl_error_log_errors;
+#ifdef PX_VIDEO
 extern void __pixl_vid_destroy_managed();
+#endif
 
 InitOptions __pixl_opts;
 WINDOW __pixl_rootwnd = nullptr;
@@ -46,7 +48,9 @@ Error px::Init(const InitOptions& opts)
 
 void px::End()
 {
+#ifdef PX_VIDEO
     __pixl_vid_destroy_managed();
+#endif
 
     AssetManager::End();
 

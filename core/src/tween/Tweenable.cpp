@@ -1,20 +1,19 @@
 #include "pixl/core/tween/Tweenable.h"
 
+#include <algorithm>
+
 using namespace px;
 
 px::Tweenable::~Tweenable()
 {
-    for (const auto& v : m_Tweens)
-    {
-        delete v.second;
-    }
+    CancelAllTweens();
 }
 
-TW px::Tweenable::TweenFloat(CREFSTR id, float from, float to, float* ptr, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenFloat(float from, float to, float* ptr, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<float>(from, to, ptr, duration, easing, delay, callback);
 
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -23,11 +22,11 @@ TW px::Tweenable::TweenFloat(CREFSTR id, float from, float to, float* ptr, float
     return t;
 }
 
-TW px::Tweenable::TweenFloat(CREFSTR id, float to, float* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenFloat(float to, float* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<float>(to, ptr, duration, easing, delay, callback);
     
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -36,11 +35,11 @@ TW px::Tweenable::TweenFloat(CREFSTR id, float to, float* ptr, float duration, c
     return t;
 }
 
-TW px::Tweenable::TweenVec2(CREFSTR id, const Vec2& from, const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenVec2(const Vec2& from, const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<Vec2>(from, to, ptr, duration, easing, delay, callback);
     
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -49,11 +48,11 @@ TW px::Tweenable::TweenVec2(CREFSTR id, const Vec2& from, const Vec2& to, Vec2* 
     return t;
 }
 
-TW px::Tweenable::TweenVec2(CREFSTR id, const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenVec2(const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<Vec2>(to, ptr, duration, easing, delay, callback);
     
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -62,11 +61,11 @@ TW px::Tweenable::TweenVec2(CREFSTR id, const Vec2& to, Vec2* ptr, float duratio
     return t;
 }
 
-TW px::Tweenable::TweenVec3(CREFSTR id, const Vec3& from, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenVec3(const Vec3& from, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<Vec3>(from, to, ptr, duration, easing, delay, callback);
     
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -75,11 +74,11 @@ TW px::Tweenable::TweenVec3(CREFSTR id, const Vec3& from, const Vec3& to, Vec3* 
     return t;
 }
 
-TW px::Tweenable::TweenVec3(CREFSTR id, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenVec3(const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<Vec3>(to, ptr, duration, easing, delay, callback);
     
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -88,11 +87,11 @@ TW px::Tweenable::TweenVec3(CREFSTR id, const Vec3& to, Vec3* ptr, float duratio
     return t;
 }
 
-TW px::Tweenable::TweenColor(CREFSTR id, const Color& from, const Color &to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenColor(const Color& from, const Color &to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<Color>(from, to, ptr, duration, easing, delay, callback);
     
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -101,11 +100,11 @@ TW px::Tweenable::TweenColor(CREFSTR id, const Color& from, const Color &to, Col
     return t;
 }
 
-TW px::Tweenable::TweenColor(CREFSTR id, const Color& to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+TW px::Tweenable::TweenColor(const Color& to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
 {
     TW t = new Tween<Color>(to, ptr, duration, easing, delay, callback);
     
-    if (!StartTween(id, t))
+    if (!StartTween(t))
     {
         delete t;
         return nullptr;
@@ -114,66 +113,168 @@ TW px::Tweenable::TweenColor(CREFSTR id, const Color& to, Color* ptr, float dura
     return t;
 }
 
-bool px::Tweenable::StartTween(CREFSTR id, TW tween)
+// Queued tweens
+
+TW px::Tweenable::QueueTweenFloat(float from, float to, float* ptr, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback& callback)
 {
-    if (m_Tweens.count(id) > 0) return false;
-    m_Queue.push(std::make_pair(id, tween));
+    TW t = new Tween<float>(from, to, ptr, duration, easing, delay, callback);
+
+    QueueTween(t);
+
+    return t;
+}
+
+TW px::Tweenable::QueueTweenFloat(float to, float* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<float>(to, ptr, duration, easing, delay, callback);
+    
+    QueueTween(t);
+
+    return t;
+}
+
+TW px::Tweenable::QueueTweenVec2(const Vec2& from, const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Vec2>(from, to, ptr, duration, easing, delay, callback);
+    
+    QueueTween(t);
+
+    return t;
+}
+
+TW px::Tweenable::QueueTweenVec2(const Vec2& to, Vec2* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Vec2>(to, ptr, duration, easing, delay, callback);
+    
+    QueueTween(t);
+
+    return t;
+}
+
+TW px::Tweenable::QueueTweenVec3(const Vec3& from, const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Vec3>(from, to, ptr, duration, easing, delay, callback);
+    
+    QueueTween(t);
+
+    return t;
+}
+
+TW px::Tweenable::QueueTweenVec3(const Vec3& to, Vec3* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Vec3>(to, ptr, duration, easing, delay, callback);
+    
+    QueueTween(t);
+
+    return t;
+}
+
+TW px::Tweenable::QueueTweenColor(const Color& from, const Color &to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Color>(from, to, ptr, duration, easing, delay, callback);
+    
+    QueueTween(t);
+
+    return t;
+}
+
+TW px::Tweenable::QueueTweenColor(const Color& to, Color* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)
+{
+    TW t = new Tween<Color>(to, ptr, duration, easing, delay, callback);
+    
+    QueueTween(t);
+
+    return t;
+}
+
+bool px::Tweenable::StartTween(TW tween)
+{
+    if (std::find(m_Tweens.begin(), m_Tweens.end(), tween) != m_Tweens.end()) return false;
+    m_Tweens.push_back(tween);
     return true;
 }
 
-void px::Tweenable::CancelTween(CREFSTR id)
+void px::Tweenable::QueueTween(TW tween)
 {
-    if (m_Tweens.count(id) < 1) return;
-    m_CancelQueue.push(id);
+    m_Queue.push(tween);
+}
+
+void px::Tweenable::CancelTween(TW tween)
+{
+    auto it = std::find(m_Tweens.begin(), m_Tweens.end(), tween);
+    if (it == m_Tweens.end()) return;
+    m_Tweens.erase(it);
+    delete tween;
 }
 
 void px::Tweenable::UpdateTweens(float delta)
 {
-    if (m_DoCancelAll)
+    if (m_CurTween)
     {
-        m_DoCancelAll = false;
+        m_CurTween->Update(delta);
 
-        for (const auto& v : m_Tweens)
+        if (m_CurTween->IsFinished() || m_CurTween->IsCanceled())
         {
-            delete v.second;
+            CancelCurrentTween();
         }
-
-        m_Tweens.clear();
+    }
+    else
+    {
+        if (!m_Queue.empty())
+        {
+            m_CurTween = m_Queue.front();
+            m_Queue.pop();
+        }
     }
 
-    while (!m_CancelQueue.empty())
+    std::vector<TweenBase*> toCancel;
+
+    for (TweenBase* tw : m_Tweens)
     {
-        std::string& id = m_CancelQueue.front();
+        tw->Update(delta);
 
-        if (m_Tweens.count(id) > 0)
+        if (tw->IsFinished() || tw->IsCanceled())
         {
-            delete m_Tweens.at(id);
-            m_Tweens.erase(id);
+            toCancel.push_back(tw);
         }
+    }
+    
+    for (TweenBase* tw : toCancel)
+    {
+        CancelTween(tw);
+    }
+}
 
-        m_CancelQueue.pop();
+void px::Tweenable::CancelTweens()
+{
+    for (TweenBase* tw : m_Tweens)
+    {
+        delete tw;
     }
 
+    m_Tweens.clear();
+}
+
+void px::Tweenable::CancelQueuedTweens()
+{
     while (!m_Queue.empty())
     {
-        auto& v = m_Queue.front();
-
-        m_Tweens.insert(v);
-        
+        TweenBase* tw = m_Queue.front();
         m_Queue.pop();
+        delete tw;
     }
+}
 
-    for (const auto& v : m_Tweens)
-    {
-        v.second->Update(delta);
-        if (v.second->IsFinished())
-        {
-            CancelTween(v.first);
-        }
-    }
+void px::Tweenable::CancelCurrentTween()
+{
+    if (!m_CurTween) return;
+    delete m_CurTween;
+    m_CurTween = nullptr;
 }
 
 void px::Tweenable::CancelAllTweens()
 {
-    m_DoCancelAll = true;
+    CancelTweens();
+    CancelQueuedTweens();
+    CancelCurrentTween();
 }

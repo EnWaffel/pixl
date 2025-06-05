@@ -41,6 +41,6 @@ namespace px
 
     typedef Font* FONT;
 
-    UTFString ToUTF(CREFSTR str);
-    std::string FromUTF(const UTFString& str);
+    PX_API UTFString ToUTF(CREFSTR str);
+    PX_API std::string FromUTF(const UTFString& str);
 }

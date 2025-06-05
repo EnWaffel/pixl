@@ -32,7 +32,7 @@ static bool HasAttribute(xml_node<>* node, const char* attribute)
     return node->first_attribute(attribute);
 }
 
-static ANIMFRAMES _Load(std::istream& stream, const ImageData& img)
+static ANIMFRAMES _Load(std::istream& stream, TEXTURE tex)
 {
     ANIMFRAMES frames;
 
@@ -50,9 +50,6 @@ static ANIMFRAMES _Load(std::istream& stream, const ImageData& img)
 
         xml_node<>* root = doc.first_node("TextureAtlas");
         if (!root) throw std::runtime_error("No root element");
-
-        xml_attribute<>* imgPath = root->first_attribute("imagePath");
-        if (!imgPath) throw std::runtime_error("Element TextureAtlas is missing the 'imagePath' attribute");
 
         for (xml_node<>* node = root->first_node(); node; node = node->next_sibling())
         {
@@ -94,8 +91,9 @@ static ANIMFRAMES _Load(std::istream& stream, const ImageData& img)
             Vec2 sourceSize = Vec2(size.w, size.h);
             if (rotated && !trimmed) sourceSize = Vec2(size.h, size.w);
         
-            frame.uvPos = Vec2(rect.x / img.width, rect.y / img.height);
-            frame.uvSize = Vec2(rect.w / img.width, rect.h / img.height);
+            frame.tex = tex;
+            frame.uvPos = Vec2(rect.x / tex->GetWidth(), rect.y / tex->GetHeight());
+            frame.uvSize = Vec2(rect.w / tex->GetWidth(), rect.h / tex->GetHeight());
             frame.size = sourceSize;
             frame.rotation = rotated ? -90.0f : 0.0f;
             frame.offset = Vec2(-size.x, -size.y);
@@ -115,8 +113,7 @@ static ANIMFRAMES _Load(std::istream& stream, const ImageData& img)
     return frames;
 }
 
-
-ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, const ImageData& img)
+ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, TEXTURE tex)
 {
     std::unique_ptr<std::istream> stream = AssetManager::GetStream(path);
     if (!stream)
@@ -125,11 +122,5 @@ ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, const ImageData& img)
         return ANIMFRAMES();
     }
 
-    return _Load(*stream.get(), img);
-}
-
-ANIMFRAMES px::SparrowAtlasLoader::Load(CREFSTR path, TEXTURE tex)
-{
-    if (!tex) return ANIMFRAMES();
-    return Load(path, tex->GetData());
+    return _Load(*stream.get(), tex);
 }

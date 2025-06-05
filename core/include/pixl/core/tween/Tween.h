@@ -22,15 +22,56 @@ namespace px
         virtual void Cancel() = 0;
     };
 
+    /*
+     T m_From;
+        T m_To;
+        T* m_Ptr;
+        float m_Duration;
+        Easing::EasingFunc m_Easing;
+        float m_Delay;
+        float m_DelayElapsed;
+        T m_Current;
+        bool m_Canceled;
+        float m_Elapsed;
+        float m_Progress;
+        TweenCompleteCallback m_OnComplete;
+    */
+
     template<typename T>
     class Tween : public TweenBase
     {
     public:
-        Tween(T from, T to, T* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& onComplete) : m_From(from), m_To(to), m_Ptr(ptr), m_Duration(duration), m_Easing(easing), m_Delay(delay), m_DelayElapsed(0.0f), m_Current(from), m_Elapsed(0.0f), m_Progress(0.0f), m_Canceled(false), m_OnComplete(onComplete) 
+        Tween(T from, T to, T* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& onComplete)
+        :
+        m_From(from),
+        m_To(to),
+        m_Ptr(ptr),
+        m_Duration(duration),
+        m_Easing(easing),
+        m_Delay(delay),
+        m_DelayElapsed(0.0f),
+        m_Current(from),
+        m_Canceled(false),
+        m_Elapsed(0.0f),
+        m_Progress(0.0f),
+        m_OnComplete(onComplete) 
         {
         }
 
-        Tween(T to, T* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& onComplete) : m_From(*ptr), m_To(to), m_Ptr(ptr), m_Duration(duration), m_Easing(easing), m_Delay(delay), m_DelayElapsed(0.0f), m_Canceled(false), m_OnComplete(onComplete)
+        Tween(T to, T* ptr, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& onComplete)
+        :
+        m_From(*ptr),
+        m_To(to),
+        m_Ptr(ptr),
+        m_Duration(duration),
+        m_Easing(easing),
+        m_Delay(delay),
+        m_DelayElapsed(0.0f),
+        m_Current(*ptr),
+        m_Canceled(false),
+        m_Elapsed(0.0f),
+        m_Progress(0.0f),
+        m_OnComplete(onComplete)
         {
         }
 
@@ -76,15 +117,15 @@ namespace px
         T m_From;
         T m_To;
         T* m_Ptr;
-        T m_Current;
         float m_Duration;
+        Easing::EasingFunc m_Easing;
         float m_Delay;
         float m_DelayElapsed;
-        float m_Progress;
-        float m_Elapsed;
+        T m_Current;
         bool m_Canceled;
+        float m_Elapsed;
+        float m_Progress;
         TweenCompleteCallback m_OnComplete;
-        Easing::EasingFunc m_Easing;
     };
 
     typedef TweenBase* TW;

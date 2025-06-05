@@ -45,7 +45,7 @@ static int AvailableInPackages(CREFSTR path)
 static std::unique_ptr<std::istream> GetFileStream(CREFSTR path)
 {
     if (!fs::exists(path)) return nullptr;
-    return std::make_unique<std::ifstream>(path, std::ios::binary);
+    return std::move(std::make_unique<std::ifstream>(path, std::ios::binary));
 }
 
 static std::unique_ptr<std::istream> GetPackageStream(CREFSTR path)
@@ -60,7 +60,7 @@ static std::unique_ptr<std::istream> GetPackageStream(CREFSTR path)
     {
         if (package->HasFile(path))
         {
-            return package->OpenStream(path);
+            return std::move(package->OpenStream(path));
         }
     }
 
@@ -72,20 +72,20 @@ static std::unique_ptr<std::istream> _GetStream(CREFSTR path)
     PX_DEBUG_LOG("_GetStream()", "Requested stream for: %s", path.c_str());
     std::unique_ptr<std::istream> stream = nullptr;
 #ifdef PX_DEBUG
-    bool isPackageStream = false;
+    int streamType = -1;
 #endif
 
     if (__prefer_packages)
     {
         stream = GetPackageStream(path);
 #ifdef PX_DEBUG
-        isPackageStream = true;
+        streamType = 1;
 #endif
         if (!stream)
         {
             stream = GetFileStream(path);
 #ifdef PX_DEBUG
-            isPackageStream = false;
+            streamType = 0;
 #endif
         }
     }
@@ -93,29 +93,31 @@ static std::unique_ptr<std::istream> _GetStream(CREFSTR path)
     {
         stream = GetFileStream(path);
 #ifdef PX_DEBUG
-        isPackageStream = false;
+        streamType = 0;
 #endif
         if (!stream)
         {
             stream = GetPackageStream(path);
 #ifdef PX_DEBUG
-            isPackageStream = true;
+            streamType = 1;
 #endif
         }
     }
 
+    if (!stream) streamType = -1;
+
 #ifdef PX_DEBUG
-    if (isPackageStream)
+    if (streamType == 1)
     {
         PX_DEBUG_LOG("_GetStream()", "Got Package stream for: %s", path.c_str());
     }
-    else
+    else if (streamType == 0)
     {
         PX_DEBUG_LOG("_GetStream()", "Got File stream for: %s", path.c_str());
     }
 #endif
 
-    return stream;
+    return streamType != -1 ? std::move(stream) : nullptr;
 }
 
 Error px::AssetManager::Init()
@@ -155,11 +157,13 @@ void px::AssetManager::End()
         delete v.second;
     }
 
+#ifdef PX_3D
     for (const auto& v : __models)
     {
         PX_DEBUG_LOG("AssetManager::End()", "Releasing model: %s", v.first.c_str());
         delete v.second;
     }
+#endif
 
     if (__ft) FT_Done_FreeType(__ft);
 }
@@ -177,11 +181,21 @@ void px::AssetManager::SetPreferPackages(bool flag)
 
 std::unique_ptr<std::istream> px::AssetManager::GetStream(CREFSTR path)
 {
-    return _GetStream(path);
+    return std::move(_GetStream(path));
 }
 
 TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing, bool reload)
 {
+    if (__textures.count(id) > 0 && !reload)
+    {
+        return __textures.at(id);
+    }
+    else if (__textures.count(id) > 0 && reload)
+    {
+        delete __textures.at(id);
+        __textures.erase(id);
+    }
+
     std::unique_ptr<std::istream> stream = GetStream(path);
     if (!stream)
     {
@@ -442,6 +456,7 @@ FONT px::AssetManager::LoadFont(CREFSTR id, CREFSTR path, uint16_t size, bool an
     return fnt;
 }
 
+#ifdef PX_3D
 MODEL px::AssetManager::LoadModel(CREFSTR id, CREFSTR path, bool antialiasing, bool reload)
 {
     if (__models.count(id) > 0 && !reload)
@@ -472,6 +487,7 @@ MODEL px::AssetManager::LoadModel(CREFSTR id, CREFSTR path, bool antialiasing, b
 
     return model;
 }
+#endif
 
 TEXTURE px::AssetManager::GetTexture(CREFSTR id)
 {
@@ -491,8 +507,94 @@ FONT px::AssetManager::GetFont(CREFSTR id)
     return __fonts.at(id);
 }
 
+#ifdef PX_3D
 MODEL px::AssetManager::GetModel(CREFSTR id)
 {
     if (__models.count(id) < 1) return nullptr;
     return __models.at(id);
+}
+#endif
+
+void px::AssetManager::ReleaseTexturesWithPrefix(CREFSTR prefix)
+{
+    std::vector<std::string> toRemove;
+
+    for (auto& v : __textures)
+    {
+        if (v.first.size() < prefix.size() || v.first.substr(0, prefix.size()) != prefix) continue;
+        toRemove.push_back(v.first);
+        delete v.second;
+        PX_DEBUG_LOG("AssetManager::ReleaseTexturesWithPrefix()", "Releasing texture: %s", v.first.c_str());
+    }
+
+    for (CREFSTR id : toRemove)
+    {
+        __textures.erase(id);
+    }
+}
+
+void px::AssetManager::ReleaseSoundsWithPrefix(CREFSTR prefix)
+{
+    std::vector<std::string> toRemove;
+
+    for (auto& v : __audio_buffers)
+    {
+        if (v.first.size() < prefix.size() || v.first.substr(0, prefix.size()) != prefix) continue;
+        toRemove.push_back(v.first);
+        delete v.second;
+        PX_DEBUG_LOG("AssetManager::ReleaseSoundsWithPrefix()", "Releasing audio buffer: %s", v.first.c_str());
+    }
+
+    for (CREFSTR id : toRemove)
+    {
+        __audio_buffers.erase(id);
+    }
+}
+
+void px::AssetManager::ReleaseFontsWithPrefix(CREFSTR prefix)
+{
+    std::vector<std::string> toRemove;
+
+    for (auto& v : __fonts)
+    {
+        if (v.first.size() < prefix.size() || v.first.substr(0, prefix.size()) != prefix) continue;
+        toRemove.push_back(v.first);
+        delete v.second;
+        PX_DEBUG_LOG("AssetManager::ReleaseFontsWithPrefix()", "Releasing font: %s", v.first.c_str());
+    }
+
+    for (CREFSTR id : toRemove)
+    {
+        __fonts.erase(id);
+    }
+}
+
+#ifdef PX_3D
+void px::AssetManager::ReleaseModelsWithPrefix(CREFSTR prefix)
+{
+    std::vector<std::string> toRemove;
+
+    for (auto& v : __models)
+    {
+        if (v.first.size() < prefix.size() || v.first.substr(0, prefix.size()) != prefix) continue;
+        toRemove.push_back(v.first);
+        delete v.second;
+        PX_DEBUG_LOG("AssetManager::ReleaseModelsWithPrefix()", "Releasing model: %s", v.first.c_str());
+    }
+
+    for (CREFSTR id : toRemove)
+    {
+        __models.erase(id);
+    }
+}
+#endif
+
+void px::AssetManager::ReleaseAllWithPrefix(CREFSTR prefix)
+{
+    ReleaseTexturesWithPrefix(prefix);
+    ReleaseSoundsWithPrefix(prefix);
+    ReleaseFontsWithPrefix(prefix);
+#ifdef PX_3D
+    ReleaseModelsWithPrefix(prefix);
+#endif
 }

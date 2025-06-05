@@ -23,7 +23,7 @@ namespace px
     {
     public:
         PX_INTERNAL Texture(const ImageData& data);
-        PX_INTERNAL ~Texture();
+        PX_API ~Texture();
 
         PX_API uint32_t GetWidth();
         PX_API uint32_t GetHeight();

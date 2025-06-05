@@ -4,11 +4,11 @@
 
 using namespace px;
 
-px::Animation::Animation() : m_FPS(0), m_Looping(false), m_Playing(false), m_Paused(false), m_Finished(false), m_Waited(0.0f), m_Idx(0)
+px::Animation::Animation() : m_FPS(0), m_Looping(false), m_Playing(false), m_Paused(false), m_Finished(false), m_ResetOnFinish(false), m_Waited(0.0f), m_Idx(0)
 {
 }
 
-px::Animation::Animation(std::vector<AnimationFrame>& frames, uint8_t fps, bool looping) : m_Frames(frames), m_FPS(fps), m_Looping(looping), m_Playing(false), m_Paused(false), m_Finished(false), m_Waited(0.0f), m_Idx(0)
+px::Animation::Animation(std::vector<AnimationFrame>& frames, uint8_t fps, bool looping) : m_Frames(frames), m_FPS(fps), m_Looping(looping), m_Playing(false), m_Paused(false), m_Finished(false), m_ResetOnFinish(false), m_Waited(0.0f), m_Idx(0)
 {
 }
 
@@ -79,6 +79,31 @@ bool px::Animation::IsFinished()
     return m_Finished;
 }
 
+bool px::Animation::IsLooping()
+{
+    return m_Looping;
+}
+
+void px::Animation::SetLooping(bool looping)
+{
+    m_Looping = looping;
+}
+
+void px::Animation::SetFPS(uint8_t fps)
+{
+    m_FPS = fps;
+}
+
+bool px::Animation::IsResetOnFinish()
+{
+    return m_ResetOnFinish;
+}
+
+void px::Animation::SetResetOnFinish(bool resetOnFinish)
+{
+    m_ResetOnFinish = resetOnFinish;
+}
+
 px::Animation::operator bool()
 {
     return m_Frames.size() > 0;
@@ -90,7 +115,7 @@ ANIM px::Animation::GetFromPrefix(CREFSTR prefix, ANIMFRAMES &frames, bool loopi
 
     for (const auto& v : frames)
     {
-        if (v.first.size() >= prefix.size() && v.first.compare(0, prefix.size(), prefix) == 0)
+        if (v.first.size() >= prefix.size() && v.first.substr(0, prefix.size()) == prefix)
         {
             _frames.push_back(v.second);
         }

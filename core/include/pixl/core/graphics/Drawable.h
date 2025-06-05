@@ -11,6 +11,8 @@ namespace px
 {
     struct PX_API DrawData
     {
+        Vec2 offset;
+        Vec2 scale;
         DRAWINGCTX ctx;
         Mat4 viewMatrix;
         void* data;
@@ -26,7 +28,7 @@ namespace px
         bool visible = true;
         int order = -1; // -1 == ignore order (always in the back)
     public:
-        PX_API virtual ~Drawable() = default;
+        virtual ~Drawable() = default;
 
         PX_API virtual void Draw(const DrawData& data) = 0;
         PX_API virtual void Update(float delta) = 0;

@@ -3,6 +3,7 @@
 #include "pixl/utility/Defs.h"
 #include "pixl/utility/Error.h"
 #include "pixl/core/math/Vec2.h"
+#include "pixl/core/asset/Texture.h"
 
 #include <vector>
 
@@ -10,6 +11,7 @@ namespace px
 {
     struct AnimationFrame
     {
+        TEXTURE tex;
         Vec2 offset;
         Vec2 size;
         Vec2 uvPos;
@@ -39,6 +41,11 @@ namespace px
         PX_API AnimationFrame& GetCurrentFrame();
         PX_API bool IsPlaying();
         PX_API bool IsFinished();
+        PX_API bool IsLooping();
+        PX_API void SetLooping(bool looping);
+        PX_API void SetFPS(uint8_t fps);
+        PX_API bool IsResetOnFinish();
+        PX_API void SetResetOnFinish(bool resetOnFinish);
 
         PX_API operator bool();
 
@@ -50,6 +57,7 @@ namespace px
         bool m_Playing;
         bool m_Paused;
         bool m_Finished;
+        bool m_ResetOnFinish;
         float m_Waited;
         uint16_t m_Idx;
     };
