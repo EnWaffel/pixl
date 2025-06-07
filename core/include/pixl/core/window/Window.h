@@ -5,6 +5,7 @@
 #include "pixl/core/math/Vec2i.h"
 #include "pixl/core/graphics/Camera.h"
 #include "pixl/core/event/EventManager.h"
+#include "pixl/core/graphics/RenderPipeline.h"
 
 #include <vector>
 
@@ -30,6 +31,15 @@ namespace px
         PX_API DRAWINGCTX GetDrawingContext();
         PX_API Vec2i GetFixedSize();
         PX_API EVTMGR GetEventManager();
+        PX_API Vec2i GetViewportPos();
+        PX_API Vec2i GetViewportSize();
+        PX_API Vec2i GetSize();
+        PX_API Vec2i GetPosition();
+        PX_API void SetPosition(const Vec2i& pos);
+        PX_API void SetSize(const Vec2i& size);
+        PX_API RENDERPIPELINE GetRenderPipeline();
+        PX_API void SetRenderPipeline(RENDERPIPELINE pipeline);
+        PX_API RENDERPIPELINE CreateDefaultPipeline();
 
         PX_API void Update(float delta);
         PX_API void UpdateEvents(float delta);

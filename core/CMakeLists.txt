@@ -39,6 +39,7 @@ src/input/KeyCode.cpp
 src/asset/Font.cpp
 src/graphics/Text.cpp
 src/graphics/SpriteGroup.cpp
+src/graphics/PostProcessingEffect.cpp
 )
 
 if(PX_VIDEO)

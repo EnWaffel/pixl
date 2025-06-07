@@ -11,7 +11,7 @@
 
 namespace px
 {
-    class PX_API Sprite : public Drawable, public Tweenable
+    class Sprite : public Drawable, public Tweenable
     {
     public:
         Vec2 pos;
@@ -73,4 +73,6 @@ namespace px
         std::string m_CurAnimName;
         std::string m_DefAnim;
     };
+
+    typedef Sprite* SPRITE;
 }

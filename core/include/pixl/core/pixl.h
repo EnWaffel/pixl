@@ -42,13 +42,14 @@
 #include "pixl/core/asset/Font.h"
 #include "pixl/core/graphics/VideoPlayer.h"
 #include "pixl/core/graphics/SpriteGroup.h"
+#include "pixl/core/graphics/PostProcessingEffect.h"
 
 #define PX_ERROR_GLFW 0x20
 #define PX_ERROR_SERVICE 0x21
 
 namespace px
 {
-    struct PX_API InitOptions
+    struct InitOptions
     {
         bool errorLogging = true;
     };
@@ -62,4 +63,7 @@ namespace px
 
     // Utility functions
     PX_API float GetTime();
+
+    PX_API Vec2 GetMousePos(CAMERA cam = nullptr, WINDOW wnd = nullptr);
+    PX_API bool IsMouseTouchingSprite(SPRITE sprite, CAMERA cam = nullptr, WINDOW wnd = nullptr);
 }

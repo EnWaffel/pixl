@@ -75,7 +75,7 @@ namespace px
 {
     class WindowImpl
     {
-    private:
+    public:
         WINDOW m_Parent;
         GLFWwindow* m_Handle;
         RENDERPIPELINE m_Pipeline;
@@ -83,6 +83,8 @@ namespace px
         DRAWINGCTX m_DrawingContext;
         Vec2i m_InitialSize;
         EventManager* m_EventManager;
+        Vec2i m_ViewportPos;
+        Vec2i m_ViewportSize;
     public:
         WindowImpl(WINDOW parent, CREFSTR title, const Vec2i& size, bool startVisible, bool decorated) : m_Parent(parent), m_InitialSize(size)
         {
@@ -128,6 +130,8 @@ namespace px
             glfwSetKeyCallback(m_Handle, _glfw_keycallback);
             glfwSetMouseButtonCallback(m_Handle, _glfw_mousebuttoncallback);
             glfwSetCursorPosCallback(m_Handle, _glfw_cursorposcallback);
+
+            m_ViewportSize = size;
 
             const GLFWvidmode* vidmode = glfwGetVideoMode(primaryMonitor);
 
@@ -187,9 +191,7 @@ namespace px
 
             m_DrawingContext = new DrawingContext;
 
-            m_Pipeline = new RenderPipeline(m_Parent);
-            m_Pipeline->AddElement("cam", new CameraRenderer);
-            m_Pipeline->AddElement("wnd", new WindowRenderer);
+            m_Pipeline = m_Parent->CreateDefaultPipeline();
 
             AddCamera(new Camera(m_Parent)); // default camera
 
@@ -316,6 +318,9 @@ static void _glfw_framebuffer_resize(GLFWwindow* window, int width, int height)
 
     glViewport(viewX, viewY, viewWidth, viewHeight);
 
+    wnd->m_ViewportPos = Vec2i(viewX, viewY);
+    wnd->m_ViewportSize = Vec2i(viewWidth, viewHeight);
+
     WindowChangedData data{};
     data.viewportPos = { viewX, viewY };
     data.viewportSize = { viewWidth, viewHeight };
@@ -421,6 +426,65 @@ Vec2i px::Window::GetFixedSize()
 EVTMGR px::Window::GetEventManager()
 {
     return m_Impl->GetEventManager();
+}
+
+Vec2i px::Window::GetViewportPos()
+{
+    return m_Impl->m_ViewportPos;
+}
+
+Vec2i px::Window::GetViewportSize()
+{
+    return m_Impl->m_ViewportSize;
+}
+
+Vec2i px::Window::GetPosition()
+{
+    Vec2i pos;
+    glfwGetWindowPos(m_Impl->m_Handle, &pos.x, &pos.y);
+    return pos;
+}
+
+Vec2i px::Window::GetSize()
+{
+    Vec2i size;
+    glfwGetWindowSize(m_Impl->m_Handle, &size.x, &size.y);
+    return size;
+}
+
+void px::Window::SetPosition(const Vec2i& pos)
+{
+    glfwSetWindowPos(m_Impl->m_Handle, pos.x, pos.y);
+}
+
+void px::Window::SetSize(const Vec2i& size)
+{
+    glfwSetWindowSize(m_Impl->m_Handle, size.x, size.y);
+}
+
+RENDERPIPELINE px::Window::GetRenderPipeline()
+{
+    return m_Impl->m_Pipeline;
+}
+
+void px::Window::SetRenderPipeline(RENDERPIPELINE pipeline)
+{
+    if (m_Impl->m_Pipeline) delete m_Impl->m_Pipeline;
+    m_Impl->m_Pipeline = pipeline;
+    
+    WindowChangedData data{};
+    data.viewportPos = m_Impl->m_ViewportPos;
+    data.viewportSize = m_Impl->m_InitialSize;
+
+    m_Impl->m_EventManager->CallEvent(PX_EVENT(WINDOW_CHANGED), data);
+}
+
+RENDERPIPELINE px::Window::CreateDefaultPipeline()
+{
+    RENDERPIPELINE pipeline = new RenderPipeline(this);
+    pipeline->AddElement("cam", new CameraRenderer);
+    pipeline->AddElement("wnd", new WindowRenderer);
+    return pipeline;
 }
 
 void px::Window::Update(float delta)

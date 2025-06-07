@@ -106,6 +106,11 @@ namespace px
         {
             glUniform4f(GetLocation(name), color.r, color.g, color.b, color.a);
         }
+
+        void SetInt(CREFSTR name, int value)
+        {
+            glUniform1i(GetLocation(name), value);
+        }
     private:
         void Compile(CREFSTR vertexCode, CREFSTR fragmentCode)
         {
@@ -202,4 +207,9 @@ void px::Shader::SetBool(CREFSTR name, bool value)
 void px::Shader::SetColor(CREFSTR name, const Color& color)
 {
     m_Impl->SetColor(name, color);
+}
+
+void px::Shader::SetInt(CREFSTR name, int value)
+{
+    m_Impl->SetInt(name, value);
 }

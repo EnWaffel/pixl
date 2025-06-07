@@ -41,6 +41,7 @@ namespace px
         PX_API void SetVec2(CREFSTR name, const Vec2& vec);
         PX_API void SetBool(CREFSTR name, bool value);
         PX_API void SetColor(CREFSTR name, const Color& color);
+        PX_API void SetInt(CREFSTR name, int value);
     private:
         ShaderImpl* m_Impl;
     };
