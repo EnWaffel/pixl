@@ -53,8 +53,10 @@ namespace px
             if (m_ListenersHIGH.count(name) > 0) m_ListenersHIGH.erase(name);
         }
 
-        void CallEvent(Event id, const EventData& data)
+        void CallEvent(Event id, EventData& data)
         {
+            data.type = id;
+
             if ((id & (id - 1)) != 0)
             {
                 Error::Throw(PX_ERROR_INVALID_OPERATION, "Cannot call an event list");
@@ -122,7 +124,7 @@ void px::EventManager::RemoveListener(CREFSTR name)
     m_Impl->RemoveListener(name);
 }
 
-void px::EventManager::CallEvent(Event id, const EventData& data)
+void px::EventManager::CallEvent(Event id, EventData& data)
 {
     m_Impl->CallEvent(id, data);
 }

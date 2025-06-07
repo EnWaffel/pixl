@@ -82,3 +82,36 @@ float px::GetTime()
 {
     return glfwGetTime();
 }
+
+Vec2 px::GetMousePos(CAMERA cam, WINDOW wnd)
+{
+    if (!wnd) wnd = __pixl_rootwnd;
+    if (!cam) cam = wnd->GetDefaultCamera();
+
+    float zoom = cam->zoom;
+
+    double xpos, ypos;
+    glfwGetCursorPos((GLFWwindow*)wnd->GetHandle(), &xpos, &ypos);
+
+    int width, height;
+    glfwGetWindowSize((GLFWwindow*)wnd->GetHandle(), &width, &height);
+
+    Vec2i viewportPos = wnd->GetViewportPos();
+    Vec2i viewportSize = wnd->GetViewportSize();
+
+    float mousePosInViewX = (float)((xpos - viewportPos.x) / (float)viewportSize.x);
+    float mousePosInViewY = (float)((ypos - viewportPos.y) / (float)viewportSize.y);
+
+    float mousePosInWindowX = mousePosInViewX * wnd->GetFixedSize().x;
+    float mousePosInWindowY = mousePosInViewY * wnd->GetFixedSize().y;
+
+    return Vec2(mousePosInWindowX, mousePosInWindowY);
+}
+
+bool px::IsMouseTouchingSprite(SPRITE sprite, CAMERA cam, WINDOW wnd)
+{
+    if (!sprite) return false;
+    Vec2 mousePos = GetMousePos(cam, wnd);
+    Vec2 diff = Vec2((sprite->size.x * sprite->scale.x) - sprite->size.x, (sprite->size.y * sprite->scale.y) - sprite->size.y);
+    return Math::RectRectIntersection(sprite->pos - (diff / 2.0f), sprite->size + diff, mousePos, Vec2(1.0f, 1.0f));
+}

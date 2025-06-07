@@ -12,10 +12,6 @@ layout(location = 1) in vec2 texCoord;
 
 out vec2 px_uv;
 
-uniform mat4 projection_matrix;
-uniform mat4 view_matrix;
-uniform mat4 model_matrix;
-
 void main()
 {
     gl_Position = vec4(pos, 1.0);
@@ -57,6 +53,7 @@ px::WindowRenderer::WindowRenderer()
 
 px::WindowRenderer::~WindowRenderer()
 {
+    m_Wnd->GetEventManager()->RemoveListener("__pixl_wnd_rend#" + std::to_string((uint64_t)this));
     if (m_WindowShader) delete m_WindowShader;
 }
 

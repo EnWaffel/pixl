@@ -49,7 +49,7 @@ Vec2 px::SpriteGroup::GetPosition()
     return Vec2(minX, minY);
 }
 
-void px::SpriteGroup::SetPosition(const Vec2& pos)
+void px::SpriteGroup::SetPosition(const Vec2 &pos)
 {
     Vec2 oldPos = GetPosition();
     Vec2 delta(pos.x - oldPos.x, pos.y - oldPos.y);

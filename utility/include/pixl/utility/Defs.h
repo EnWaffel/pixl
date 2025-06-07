@@ -33,6 +33,14 @@ extern void __pixl_debug_log(const char* file, int line, const char* func, const
 #define PX_DEBUG_LOG
 #endif
 
+#ifdef PX_WIN
+#define PX_SEPARATOR '\\'
+#define PX_SEPARATORs "\\"
+#else
+#define PX_SEPARATOR '/'
+#define PX_SEPARATORs "/"
+#endif
+
 namespace px
 {
     typedef const std::string& CREFSTR;

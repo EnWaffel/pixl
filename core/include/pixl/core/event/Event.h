@@ -23,6 +23,7 @@ namespace px
 
     struct EventData
     {
+        Event type;
     };
 
     struct WindowChangedData : public EventData

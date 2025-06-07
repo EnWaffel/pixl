@@ -17,7 +17,7 @@ void main()
 		uv.y = 1.0 - uv.y;
 	}
 
-    vec4 c = texture(px_texture, px_uv * px_uv_size + px_uv_coord);
+    vec4 c = texture(px_texture, uv * px_uv_size + px_uv_coord);
     gl_FragColor = c * px_color;
 }
 )";
@@ -89,6 +89,7 @@ px::CameraRenderer::CameraRenderer()
 
 px::CameraRenderer::~CameraRenderer()
 {
+    m_Wnd->GetEventManager()->RemoveListener("__pixl_cam_rend#" + std::to_string((uint64_t)this));
     if (m_SpriteShader) delete m_SpriteShader;
     if (m_TextShader) delete m_TextShader;
     if (m_Framebuf) delete m_Framebuf;
@@ -104,7 +105,7 @@ void px::CameraRenderer::Construct()
     m_TextShader->Use();
     m_TextShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 
-    m_Framebuf = new Framebuffer(m_Wnd->GetFixedSize(), true);
+    m_Framebuf = new Framebuffer(m_Wnd->GetViewportSize(), true);
 
     m_Wnd->GetEventManager()->AddListener("__pixl_cam_rend#" + std::to_string((uint64_t)this), PX_EVENT(WINDOW_CHANGED), __pixl_cam_rend_evt::__pixl_cam_rend_on_window_event, ListenerPriority::HIGH, this);
 }

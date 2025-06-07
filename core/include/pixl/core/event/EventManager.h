@@ -27,7 +27,7 @@ namespace px
 
         PX_API void AddListener(CREFSTR name, Event events, const EventListener& listener, ListenerPriority priority = ListenerPriority::LOW, void* userData = nullptr);
         PX_API void RemoveListener(CREFSTR name);
-        PX_API void CallEvent(Event id, const EventData& data);
+        PX_API void CallEvent(Event id, EventData& data);
     private:
         EventManagerImpl* m_Impl;
     };
