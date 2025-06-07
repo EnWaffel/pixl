@@ -34,7 +34,8 @@ Just add the following arguments to the CMake command to enable the features you
 
 - Git
 - CMake
-- MinGW or MSVC
+- MinGW or MSVC (only for Windows)
+- Make (only for Linux)
 
 ### All you need to do is:
 
