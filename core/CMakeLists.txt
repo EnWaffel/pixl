@@ -40,6 +40,7 @@ src/asset/Font.cpp
 src/graphics/Text.cpp
 src/graphics/SpriteGroup.cpp
 src/graphics/PostProcessingEffect.cpp
+src/graphics/SimpleRenderer.cpp
 )
 
 if(PX_VIDEO)

@@ -43,6 +43,7 @@
 #include "pixl/core/graphics/VideoPlayer.h"
 #include "pixl/core/graphics/SpriteGroup.h"
 #include "pixl/core/graphics/PostProcessingEffect.h"
+#include "pixl/core/graphics/SimpleRenderer.h"
 
 #define PX_ERROR_GLFW 0x20
 #define PX_ERROR_SERVICE 0x21

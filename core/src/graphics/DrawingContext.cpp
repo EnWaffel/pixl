@@ -79,6 +79,13 @@ void px::DrawingContext::DrawQuad()
 	glBindVertexArray(0);
 }
 
+void px::DrawingContext::DrawQuadOutline()
+{
+    glBindVertexArray(m_Data[0]);
+	glDrawArrays(GL_LINE_LOOP, 0, 6);
+	glBindVertexArray(0);
+}
+
 void px::DrawingContext::DrawScreenQuad()
 {
 	glBindVertexArray(m_Data[1]);

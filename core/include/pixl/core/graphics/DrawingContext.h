@@ -11,6 +11,7 @@ namespace px
         PX_INTERNAL ~DrawingContext();
 
         PX_API void DrawQuad();
+        PX_API void DrawQuadOutline();
         PX_API void DrawScreenQuad();
     private:
         unsigned int m_Data[2];
