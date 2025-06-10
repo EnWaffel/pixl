@@ -11,7 +11,7 @@
 
 namespace px
 {
-    class Sprite : public Drawable, public Tweenable
+    class PX_API Sprite : public Drawable, public Tweenable
     {
     public:
         Vec2 pos;
