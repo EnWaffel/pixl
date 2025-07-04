@@ -6,6 +6,7 @@
 #include "pixl/core/animation/Animation.h"
 #include "pixl/utility/Axis.h"
 #include "pixl/core/tween/Tweenable.h"
+#include "pixl/core/asset/TextureAtlas.h"
 
 #include <unordered_map>
 
@@ -27,6 +28,8 @@ namespace px
 		Vec2 uvSize = Vec2(1.0f);
         bool flipX = false;
         bool flipY = false;
+        TEXTUREATLAS atlas = nullptr;
+        SubTexture subTex;
     public:
         PX_API Sprite();
         PX_API Sprite(TEXTURE tex);
@@ -35,11 +38,14 @@ namespace px
         PX_API ~Sprite();
 
         PX_API void SetTexture(TEXTURE tex);
+        PX_API void SetTexture(CREFSTR name);
+        
+        PX_API void Center(Axis axis);
+        PX_API void Center(Axis axis, const Vec2& parentSize);
+        
         PX_API void AddAnimation(CREFSTR name, ANIM animation, const Vec2& offset = Vec2());
         PX_API void PlayAnimation(CREFSTR name);
         PX_API void SetDefaultAnimation(CREFSTR name);
-        PX_API void Center(Axis axis);
-        PX_API void Center(Axis axis, const Vec2& parentSize);
         PX_API ANIM* GetAnimation(CREFSTR name);
         PX_API ANIM* GetCurrentAnimation();
         PX_API CREFSTR GetCurrentAnimationName();

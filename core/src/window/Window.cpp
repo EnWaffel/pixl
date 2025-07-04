@@ -80,11 +80,13 @@ namespace px
         GLFWwindow* m_Handle;
         RENDERPIPELINE m_Pipeline;
         std::vector<CAMERA> m_Cameras;
+        std::vector<CAMERA> m_DrawCameras;
         DRAWINGCTX m_DrawingContext;
         Vec2i m_InitialSize;
         EventManager* m_EventManager;
         Vec2i m_ViewportPos;
         Vec2i m_ViewportSize;
+        CAMERA m_StaticCamera;
     public:
         WindowImpl(WINDOW parent, CREFSTR title, const Vec2i& size, bool startVisible, bool decorated) : m_Parent(parent), m_InitialSize(size)
         {
@@ -178,6 +180,7 @@ namespace px
                 delete camera;
             }
 
+            delete m_StaticCamera;
             delete m_DrawingContext;
             delete m_Pipeline;
             delete m_EventManager;
@@ -193,6 +196,7 @@ namespace px
 
             m_Pipeline = m_Parent->CreateDefaultPipeline();
 
+            m_StaticCamera = new Camera(m_Parent);
             AddCamera(new Camera(m_Parent)); // default camera
 
             WindowChangedData data{};
@@ -233,6 +237,7 @@ namespace px
                 __pixl_timer_update(delta);
             }
 
+            m_StaticCamera->Update(delta);
             for (CAMERA camera : m_Cameras)
             {
                 camera->Update(delta);
@@ -259,12 +264,16 @@ namespace px
 
         const std::vector<CAMERA> GetCameras()
         {
-            return m_Cameras;
+            return m_DrawCameras;
         }
 
         void AddCamera(CAMERA camera)
         {
             m_Cameras.push_back(camera);
+
+            m_DrawCameras.clear();
+            m_DrawCameras.assign(m_Cameras.begin(), m_Cameras.end());
+            m_DrawCameras.push_back(m_StaticCamera);
         }
 
         void RemoveCamera(CAMERA camera)
@@ -272,6 +281,10 @@ namespace px
             auto it = std::find(m_Cameras.begin(), m_Cameras.end(), camera);
             if (it == m_Cameras.end()) return;
             m_Cameras.erase(it);
+
+            m_DrawCameras.clear();
+            m_DrawCameras.assign(m_Cameras.begin(), m_Cameras.end());
+            m_DrawCameras.push_back(m_StaticCamera);
         }
 
         CAMERA GetDefaultCamera()
@@ -293,6 +306,11 @@ namespace px
         EVTMGR GetEventManager()
         {
             return m_EventManager;
+        }
+
+        void Close()
+        {
+            glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
         }
     };
 };
@@ -485,6 +503,16 @@ RENDERPIPELINE px::Window::CreateDefaultPipeline()
     pipeline->AddElement("cam", new CameraRenderer);
     pipeline->AddElement("wnd", new WindowRenderer);
     return pipeline;
+}
+
+CAMERA px::Window::GetStaticCamera()
+{
+    return m_Impl->m_StaticCamera;
+}
+
+void px::Window::Close()
+{
+    m_Impl->Close();
 }
 
 void px::Window::Update(float delta)

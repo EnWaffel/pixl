@@ -40,6 +40,8 @@ namespace px
         PX_API RENDERPIPELINE GetRenderPipeline();
         PX_API void SetRenderPipeline(RENDERPIPELINE pipeline);
         PX_API RENDERPIPELINE CreateDefaultPipeline();
+        PX_API CAMERA GetStaticCamera();
+        PX_API void Close();
 
         PX_API void Update(float delta);
         PX_API void UpdateEvents(float delta);

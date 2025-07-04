@@ -24,6 +24,7 @@ static std::unordered_map<std::string, TEXTURE> __textures;
 static std::unordered_map<std::string, AUDIOBUF> __audio_buffers;
 static std::unordered_map<std::string, FONT> __fonts;
 static std::unordered_map<std::string, MODEL> __models;
+static std::unordered_map<std::string, TEXTUREATLAS> __atlases;
 
 static bool EndsWith(CREFSTR filename, CREFSTR ext) {
     if (filename.length() < ext.length()) return false;
@@ -71,36 +72,26 @@ static std::unique_ptr<std::istream> _GetStream(CREFSTR path)
 {
     PX_DEBUG_LOG("_GetStream()", "Requested stream for: %s", path.c_str());
     std::unique_ptr<std::istream> stream = nullptr;
-#ifdef PX_DEBUG
     int streamType = -1;
-#endif
 
     if (__prefer_packages)
     {
         stream = GetPackageStream(path);
-#ifdef PX_DEBUG
         streamType = 1;
-#endif
         if (!stream)
         {
             stream = GetFileStream(path);
-#ifdef PX_DEBUG
             streamType = 0;
-#endif
         }
     }
     else
     {
         stream = GetFileStream(path);
-#ifdef PX_DEBUG
         streamType = 0;
-#endif
         if (!stream)
         {
             stream = GetPackageStream(path);
-#ifdef PX_DEBUG
             streamType = 1;
-#endif
         }
     }
 
@@ -165,6 +156,12 @@ void px::AssetManager::End()
     }
 #endif
 
+    for (const auto& v : __atlases)
+    {
+        PX_DEBUG_LOG("AssetManager::End()", "Releasing atlas: %s", v.first.c_str());
+        delete v.second;
+    }
+
     if (__ft) FT_Done_FreeType(__ft);
 }
 
@@ -184,7 +181,7 @@ std::unique_ptr<std::istream> px::AssetManager::GetStream(CREFSTR path)
     return std::move(_GetStream(path));
 }
 
-TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing, bool reload)
+TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing, bool reload, bool manage)
 {
     if (__textures.count(id) > 0 && !reload)
     {
@@ -241,7 +238,7 @@ TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasin
     img.size = width * height * 4;
     img.format = ImageFormat::RGBA;
 
-    TEXTURE tex = LoadTexture(id, img, antialiasing, reload);
+    TEXTURE tex = LoadTexture(id, img, antialiasing, reload, manage);
     if (!tex)
     {
         stbi_image_free(data);
@@ -253,7 +250,7 @@ TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasin
     return tex;
 }
 
-TEXTURE px::AssetManager::LoadTexture(CREFSTR id, const ImageData& img, bool antialiasing, bool reload)
+TEXTURE px::AssetManager::LoadTexture(CREFSTR id, const ImageData& img, bool antialiasing, bool reload, bool manage)
 {
     if (__textures.count(id) > 0 && !reload)
     {
@@ -326,7 +323,7 @@ TEXTURE px::AssetManager::LoadTexture(CREFSTR id, const ImageData& img, bool ant
 
     TEXTURE texture = new Texture(d);
 
-    __textures.insert({ id, texture });
+    if (manage) __textures.insert({ id, texture });
 
     return texture;
 }
@@ -489,6 +486,24 @@ MODEL px::AssetManager::LoadModel(CREFSTR id, CREFSTR path, bool antialiasing, b
 }
 #endif
 
+TEXTUREATLAS px::AssetManager::LoadAtlas(CREFSTR id, CREFSTR path, const AtlasMeta& meta, bool antialiasing, bool reload)
+{
+    if (__atlases.count(id) > 0 && !reload)
+    {
+        return __atlases.at(id);
+    }
+    else if (__atlases.count(id) > 0 && reload)
+    {
+        delete __atlases.at(id);
+        __atlases.erase(id);
+    }
+
+    TEXTUREATLAS atlas = new TextureAtlas(LoadTexture(id, path + PX_SEPARATOR + meta.imagePath, antialiasing, reload, false), meta.subTextures);
+    __atlases.insert({ id, atlas });
+
+    return atlas;
+}
+
 TEXTURE px::AssetManager::GetTexture(CREFSTR id)
 {
     if (__textures.count(id) < 1) return nullptr;
@@ -514,6 +529,18 @@ MODEL px::AssetManager::GetModel(CREFSTR id)
     return __models.at(id);
 }
 #endif
+
+TEXTUREATLAS px::AssetManager::GetAtlas(CREFSTR id)
+{
+    if (__atlases.count(id) < 1) return nullptr;
+    return __atlases.at(id);
+}
+
+SubTexture px::AssetManager::GetSub(CREFSTR id, CREFSTR name)
+{
+    if (__atlases.count(id) < 1) return {};
+    return __atlases.at(id)->Get(name);
+}
 
 void px::AssetManager::ReleaseTexturesWithPrefix(CREFSTR prefix)
 {

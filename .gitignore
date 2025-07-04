@@ -3,3 +3,8 @@ assets
 .vscode
 test
 *.apkg
+build-test.bat
+*.dll
+*.zip
+*.exe
+*.mp4

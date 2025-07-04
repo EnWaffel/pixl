@@ -1,5 +1,6 @@
 #include "pixl/core/animation/loader/SparrowAtlasLoader.h"
 #include "pixl/core/asset/AssetManager.h"
+#include "pixl/core/math/Rect.h"
 
 #include <fstream>
 #include <rapidxml.hpp>
@@ -8,14 +9,6 @@
 
 using namespace px;
 using namespace rapidxml;
-
-struct Rect
-{
-    float x;
-    float y;
-    float w;
-    float h;
-};
 
 static float GetFloat(xml_node<>* node, const char* attribute)
 {

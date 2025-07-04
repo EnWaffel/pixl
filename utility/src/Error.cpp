@@ -15,7 +15,7 @@ Error::Error() : m_HasError(false)
 {
 }
 
-Error::Error(uint16_t code) : m_HasError(code != PX_SUCCESS), m_Code(code)
+Error::Error(uint64_t code) : m_HasError(code != PX_SUCCESS), m_Code(code)
 {
 }
 
@@ -24,7 +24,7 @@ px::Error::operator bool() const
     return !m_HasError;
 }
 
-px::Error::operator uint16_t() const
+px::Error::operator uint64_t() const
 {
     return m_Code;
 }
@@ -86,7 +86,7 @@ static void _show_error_popup(CREFSTR message)
     }
 }
 
-void px::Error::Throw(uint16_t code, CREFSTR message)
+void px::Error::Throw(uint64_t code, CREFSTR message)
 {
     if (!__init) _init();
 
@@ -118,7 +118,7 @@ bool px::Error::HasError()
     return __pixl__cur_error_code != PX_SUCCESS;
 }
 
-uint16_t px::Error::GetErrorCode()
+uint64_t px::Error::GetErrorCode()
 {
     return __pixl__cur_error_code;
 }

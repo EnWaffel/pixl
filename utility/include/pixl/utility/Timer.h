@@ -16,8 +16,8 @@ namespace px
         PX_INTERNAL Timer() = delete;
         PX_INTERNAL ~Timer() = delete;
 
-        static void Start(CREFSTR id, float duration, const TimerCallback& callback);
-        static void StartTicked(CREFSTR id, float duration, const TickedTimerCallback& callback);
-        static void Stop(CREFSTR id);
+        PX_API static void Start(CREFSTR id, float duration, const TimerCallback& callback);
+        PX_API static void StartTicked(CREFSTR id, float duration, const TickedTimerCallback& callback);
+        PX_API static void Stop(CREFSTR id);
     };
 };

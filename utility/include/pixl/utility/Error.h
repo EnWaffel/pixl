@@ -18,17 +18,17 @@ namespace px
     {
     public:
         PX_API Error();
-        PX_API Error(uint16_t code);
+        PX_API Error(uint64_t code);
 
         PX_API explicit operator bool() const;
-        PX_API operator uint16_t() const;
+        PX_API operator uint64_t() const;
     private:
         bool m_HasError;
-        uint16_t m_Code;
+        uint64_t m_Code;
     public:
-        PX_API static void Throw(uint16_t code, CREFSTR message);
+        PX_API static void Throw(uint64_t code, CREFSTR message);
         PX_API static bool HasError();
-        PX_API static uint16_t GetErrorCode();
+        PX_API static uint64_t GetErrorCode();
         PX_API static CREFSTR GetErrorMessage();
     };
 }

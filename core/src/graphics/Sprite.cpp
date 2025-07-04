@@ -7,7 +7,7 @@ using namespace px;
 
 extern WINDOW __pixl_rootwnd;
 
-px::Sprite::Sprite()
+px::Sprite::Sprite() : subTex({ {}, {}, {}, {}, 0.0f })
 {
 }
 
@@ -43,6 +43,14 @@ void px::Sprite::SetTexture(TEXTURE tex)
 	size = Vec2(tex->GetWidth(), tex->GetHeight());
 }
 
+void px::Sprite::SetTexture(CREFSTR name)
+{
+	if (!atlas) return;
+	tex = atlas->GetTexture();
+	subTex = atlas->Get(name);
+	size = subTex.screenSize;
+}
+
 void px::Sprite::AddAnimation(CREFSTR name, ANIM animation, const Vec2& offset)
 {
 	if (!animation) return;
@@ -66,7 +74,6 @@ void px::Sprite::PlayAnimation(CREFSTR name)
 	size.x = frame.uvSize.x * tex->GetWidth();
 	size.y = frame.uvSize.y * tex->GetHeight();
 	rotation = frame.rotation;
-
 }
 
 void px::Sprite::SetDefaultAnimation(CREFSTR name)
@@ -118,25 +125,39 @@ void px::Sprite::Draw(const DrawData& data)
 {
     data.shd->Use();
 
-    Vec2 _pos = pos;
-	_pos.x -= data.offset.x * scrollFactor.x;
-	_pos.y -= data.offset.y * scrollFactor.y;
+	Vec2 drawOffset;
+	Vec2 drawUVPos = uvPos;
+	Vec2 drawUVSize = uvSize;
+	Vec2 texSize = tex ? Vec2(tex->GetWidth(), tex->GetHeight()) : Vec2();
+	Vec2 drawSize = size;
+
+	if (atlas)
+	{
+		drawUVPos = Vec2(subTex.offset) / texSize;
+		drawUVSize = Vec2(subTex.size) / texSize;
+		drawSize = subTex.screenSize;
+	}
+
+    Vec2 drawPos = pos;
+	drawPos.x -= data.offset.x * scrollFactor.x;
+	drawPos.y -= data.offset.y * scrollFactor.y;
 
 	Mat4 mat;
-	Vec2 diff = Vec2((size.x * scale.x) - size.x, (size.y * scale.y) - size.y);
+	Vec2 diff = Vec2((drawSize.x * scale.x) - drawSize.x, (drawSize.y * scale.y) - drawSize.y);
 
-	mat.Translate(Vec2(_pos.x - (diff.x / 2.0f), _pos.y - (diff.y / 2.0f)));
+	mat.Translate(Vec2(drawPos.x - (diff.x / 2.0f), drawPos.y - (diff.y / 2.0f)));
 
-	mat.Translate(Vec2(size.x * pivotPoint.x * scale.x, size.y * pivotPoint.y * scale.y));
-	mat.Rotate(Vec3(0.0f, 0.0f, rotation));
-	mat.Translate(Vec2(-(size.x * pivotPoint.x) * scale.x, -(size.y * pivotPoint.y) * scale.y));
-	mat.Translate(offset);
+	mat.Translate(Vec2(drawSize.x * pivotPoint.x * scale.x, drawSize.y * pivotPoint.y * scale.y));
+	mat.Rotate(Vec3(0.0f, 0.0f, rotation + subTex.screenRotation));
+	mat.Translate(Vec2(-(drawSize.x * pivotPoint.x) * scale.x, -(drawSize.y * pivotPoint.y) * scale.y));
+	
+	mat.Translate(offset + subTex.screenOffset);
 
-	mat.Scale(Vec2(size.x + diff.x, size.y + diff.y));
+	mat.Scale(Vec2(drawSize.x + diff.x, drawSize.y + diff.y));
 
     data.shd->SetMatrix4("model_matrix", mat);
-	data.shd->SetVec2("px_uv_coord", uvPos);
-	data.shd->SetVec2("px_uv_size", uvSize);
+	data.shd->SetVec2("px_uv_coord", drawUVPos);
+	data.shd->SetVec2("px_uv_size", drawUVSize);
 	data.shd->SetBool("px_flip_x", flipX);
 	data.shd->SetBool("px_flip_y", flipY);
 	data.shd->SetColor("px_color", color);

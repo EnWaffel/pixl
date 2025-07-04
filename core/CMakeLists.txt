@@ -6,6 +6,12 @@ add_compile_options(-Wall)
 add_compile_definitions(-DPX_EXPORTS)
 add_compile_definitions(-DPX_DEBUG)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+add_compile_options(-static-libstdc++)
+add_compile_options(-static-libgcc)
+add_compile_options(-static)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 
 set(SRC
 src/Core.cpp
@@ -41,6 +47,8 @@ src/graphics/Text.cpp
 src/graphics/SpriteGroup.cpp
 src/graphics/PostProcessingEffect.cpp
 src/graphics/SimpleRenderer.cpp
+src/asset/TextureAtlas.cpp
+src/math/Rect.cpp
 )
 
 if(PX_VIDEO)
@@ -77,22 +85,6 @@ if(WIN32)
     glfw
     OpenAL
     freetype
-    kernel32
-    user32
-    gdi32
-    winspool
-    shell32
-    ole32
-    oleaut32
-    uuid
-    comdlg32
-    advapi32
-    ws2_32
-    Mfplat
-    Mfuuid
-    Secur32
-    Bcrypt
-    strmiids
     brotlidec
     brotlienc
     brotlicommon
@@ -111,7 +103,28 @@ else()
 endif()
 
 if(PX_VIDEO)
-    list(APPEND LIBS avcodec avdevice avfilter avformat avutil swresample swscale)
+    list(APPEND LIBS avformat avcodec avdevice avfilter avutil swresample swscale)
+endif()
+
+if(WIN32)
+    list(APPEND LIBS
+    kernel32
+    user32
+    gdi32
+    winspool
+    shell32
+    ole32
+    oleaut32
+    uuid
+    comdlg32
+    advapi32
+    ws2_32
+    Mfplat
+    Mfuuid
+    Secur32
+    Bcrypt
+    strmiids
+    )
 endif()
 
 if(PX_3D)

@@ -6,6 +6,7 @@
 #include "pixl/utility/Axis.h"
 #include "pixl/utility/Timer.h"
 #include "pixl/utility/Color.h"
+#include "pixl/utility/FileUtils.h"
 
 // core
 #include "pixl/core/animation/loader/SparrowAtlasLoader.h"
@@ -55,16 +56,55 @@ namespace px
         bool errorLogging = true;
     };
 
-    // Library functions
+    /**
+     * @brief Initializes the library. This function needs to be called before any other library function!
+     * 
+     * @param options Optional parameters for pixl. (e.g. Whether errors should be logged to the console)
+     * 
+     * @return PX_SUCCESS if no error occurred, PX_ERROR_GLFW for GLFW errors or PX_ERROR_SERVICE for internal service errors.
+     */
     PX_API Error Init(const InitOptions& options = {});
+    /**
+     * @brief Terminates pixl and frees any resources allocated by the library.
+     */
     PX_API void End();
 
-    // Window functions
+    /**
+     * @brief Creates a window for rendering.
+     * 
+     * @param title The title of the window.
+     * @param size The width and height of the window in pixels.
+     * @param startVisible Whether the window should be visible after creation.
+     * @param decorated Whether to have top bar, close and minimize / maximize buttons.
+     * 
+     * @return A pointer to the Window object.
+     */
     PX_API WINDOW CreateWindow(CREFSTR title, const Vec2i& size, bool startVisible = false, bool decorated = true);
 
-    // Utility functions
+    /**
+     * @brief Returns the time since pixl was initialized in seconds.
+     * 
+     * @return The time since initialization in seconds.
+     */
     PX_API float GetTime();
 
+    /**
+     * @brief Returns the position of the user's cursor inside the window size range. (e.g. X: 0 - 1280 | Y: 0 - 720)
+     * 
+     * @param cam Optional parameter for the camera to get the position in. (nullptr = Default Camera)
+     * @param wnd Optional parameter for the window to get the position from. (nullptr = First window created (Root Window))
+     * 
+     * @returns The position of the user's cursor.
+     */
     PX_API Vec2 GetMousePos(CAMERA cam = nullptr, WINDOW wnd = nullptr);
+    /**
+     * @brief Checks if the user's cursor is touching a sprite.
+     * 
+     * @param sprite The sprite to check for.
+     * @param cam Optional parameter for the camera to get the position in. (nullptr = Default Camera)
+     * @param wnd Optional parameter for the window to get the position from. (nullptr = First window created (Root Window))
+     * 
+     * @returns Whether the user's cursor is touching the sprite.
+     */
     PX_API bool IsMouseTouchingSprite(SPRITE sprite, CAMERA cam = nullptr, WINDOW wnd = nullptr);
 }

@@ -262,7 +262,7 @@ namespace px
             m_Packet = av_packet_alloc();
             m_Frame = av_frame_alloc();
 
-            m_SwsCtx = sws_getContext(m_Ctx->width, m_Ctx->height, m_Ctx->pix_fmt, m_Ctx->width, m_Ctx->height, AV_PIX_FMT_RGB24, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+            m_SwsCtx = sws_getContext(m_Ctx->width, m_Ctx->height, m_Ctx->pix_fmt, __pixl_rootwnd->GetFixedSize().x, __pixl_rootwnd->GetFixedSize().y, AV_PIX_FMT_RGB24, SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
             m_TexturesCount = frameBufferSize;
             
@@ -363,9 +363,9 @@ namespace px
                         {
                             av_frame_unref(rgb);
                             rgb->format = AV_PIX_FMT_RGB24;
-                            rgb->width = m_Ctx->width;
-                            rgb->height = m_Ctx->height;
-                            av_frame_get_buffer(rgb, 32);
+                            rgb->width = __pixl_rootwnd->GetFixedSize().x;
+                            rgb->height = __pixl_rootwnd->GetFixedSize().y;
+                            av_frame_get_buffer(rgb, 0);
                         }
 
                         sws_scale(
