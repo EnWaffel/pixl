@@ -10,29 +10,23 @@
 #define PX_ERROR_SHADER_COMPILEf 0x41
 #define PX_ERROR_SHADER_LINK 0x42
 
+#define PX_ERROR_SHADER_CODE_ORDER 0x43
+
 namespace px
 {
-    /*
-    Predefined uniforms and vars:
-
-    px_texture - input texture
-    px_color - blend color
-    px_uv_coord - texture uv coord
-    px_uv_size - texture uv size
-    px_flip_x - flag, whether the output should be flipped on the x axis
-    px_flip_y - flag, whether the output should be flipped on the y axis
-    px_resolution - camera resolution
-    px_time - time in seconds
-
-    */
+    enum class ShaderProfile
+    {
+        CORE,
+        COMPATIBILITY,
+        ES // --- !!! Currently not supported!
+    };
 
     class ShaderImpl;
 
     class Shader
     {
     public:
-        PX_INTERNAL Shader(CREFSTR vertexCode, CREFSTR fragmentCode, bool header = true);
-        PX_API Shader(CREFSTR fragmentCode, bool header = true);
+        PX_INTERNAL Shader(CREFSTR vertexCode, CREFSTR fragmentCode);
         PX_API ~Shader();
 
         PX_API void Use();
@@ -42,9 +36,33 @@ namespace px
         PX_API void SetBool(CREFSTR name, bool value);
         PX_API void SetColor(CREFSTR name, const Color& color);
         PX_API void SetInt(CREFSTR name, int value);
+
+        PX_API static Shader* Compile(CREFSTR vertexCode, CREFSTR fragmentCode);
     private:
         ShaderImpl* m_Impl;
     };
 
     typedef Shader* SHADER;
+
+    class ShaderCodeBuilder
+    {
+    public:
+        PX_INTERNAL ShaderCodeBuilder() = default;
+
+        PX_API static ShaderCodeBuilder New();
+        PX_API static ShaderCodeBuilder NewDefault(); // Calls Version() for you with the default args
+
+        PX_API ShaderCodeBuilder Version(ShaderProfile profile = ShaderProfile::CORE, int major = PX_OPENGL_VERSION_MAJOR, int minor = PX_OPENGL_VERSION_MINOR);
+        PX_API ShaderCodeBuilder BasicVertex();
+        PX_API ShaderCodeBuilder WindowVertex();
+        PX_API ShaderCodeBuilder BasicFragment();
+        PX_API ShaderCodeBuilder WindowFragment();
+        PX_API ShaderCodeBuilder Fragment(CREFSTR code, bool header = true);
+        PX_API std::pair<std::string, std::string> Build();
+        PX_API SHADER Compile();
+    private:
+        int m_Steps;
+        std::string m_VCode;
+        std::string m_FCode;
+    };
 }

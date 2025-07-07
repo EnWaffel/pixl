@@ -5,6 +5,8 @@
 #include <iostream>
 
 #define PX_VERSION { 1, 0 }
+#define PX_OPENGL_VERSION_MAJOR 4
+#define PX_OPENGL_VERSION_MINOR 3
 
 #if defined(_WIN32) || defined(_WIN64)
     #define PX_WIN

@@ -1,42 +1,97 @@
 #include "pixl/core/graphics/Shader.h"
+#include "pixl/core/Shaders.h"
 
 #include <glad/glad.h>
+#include <fmt/format.h>
 
 using namespace px;
 
-static const char* __pixl_vertex = R"(
-#version 330 core
+#define MIN_STEPS 4
 
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 texCoord;
-
-out vec2 px_uv;
-
-uniform mat4 projection_matrix;
-uniform mat4 view_matrix;
-uniform mat4 model_matrix;
-
-void main()
+static std::string ProfileToStr(ShaderProfile profile)
 {
-	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(pos, 1.0);
-	px_uv = texCoord;
+    switch (profile)
+    {
+        default:
+        case ShaderProfile::CORE: return "core";
+        case ShaderProfile::COMPATIBILITY: return "compatibility";
+        case ShaderProfile::ES: return "es";
+    }
 }
-)";
 
-static const char* __pixl_fragment_header = R"(
-#version 330 core
+static std::string VersionToStr(int major, int minor)
+{
+    return fmt::format("{}{}0", major, minor);
+}
 
-in vec2 px_uv;
+// ShaderCodeBuilder
 
-uniform sampler2D px_texture;
-uniform vec4 px_color;
-uniform vec2 px_uv_coord;
-uniform vec2 px_uv_size;
-uniform bool px_flip_x;
-uniform bool px_flip_y;
-uniform vec2 px_resolution;
-uniform float px_time;
-)";
+ShaderCodeBuilder px::ShaderCodeBuilder::New()
+{
+    ShaderCodeBuilder builder;
+    builder.m_Steps = 0;
+    return builder;
+}
+
+ShaderCodeBuilder px::ShaderCodeBuilder::NewDefault()
+{
+    ShaderCodeBuilder builder;
+    builder.m_Steps = 0;
+    builder.Version(ShaderProfile::CORE, PX_OPENGL_VERSION_MAJOR, PX_OPENGL_VERSION_MINOR);
+    return builder;
+}
+
+ShaderCodeBuilder px::ShaderCodeBuilder::Version(ShaderProfile profile, int major, int minor)
+{
+    m_VCode += fmt::format("#version {} {}\n", VersionToStr(major, minor), ProfileToStr(profile));
+    m_FCode = m_VCode;
+    return *this;
+}
+
+ShaderCodeBuilder px::ShaderCodeBuilder::BasicVertex()
+{
+    m_VCode += PX_SHADER_VERTEX_BASIC;
+    return *this;
+}
+
+ShaderCodeBuilder px::ShaderCodeBuilder::WindowVertex()
+{
+    m_VCode += PX_SHADER_VERTEX_WINDOW;
+    return *this;
+}
+
+ShaderCodeBuilder px::ShaderCodeBuilder::BasicFragment()
+{
+    m_FCode += PX_SHADER_FRAGMENT_HEADER;
+    m_FCode += PX_SHADER_FRAGMENT_BASIC;
+    return *this;
+}
+
+ShaderCodeBuilder px::ShaderCodeBuilder::WindowFragment()
+{
+    m_FCode += PX_SHADER_FRAGMENT_HEADER;
+    m_FCode += PX_SHADER_FRAGMENT_WINDOW;
+    return *this;
+}
+
+ShaderCodeBuilder px::ShaderCodeBuilder::Fragment(CREFSTR code, bool header)
+{
+    if (header) m_FCode += PX_SHADER_FRAGMENT_HEADER;
+    m_FCode += code;
+    return *this;
+}
+
+std::pair<std::string, std::string> px::ShaderCodeBuilder::Build()
+{
+    return std::make_pair(m_VCode, m_FCode);
+}
+
+SHADER px::ShaderCodeBuilder::Compile()
+{
+    return Shader::Compile(m_VCode, m_FCode);
+}
+
+// ShaderImpl
 
 namespace px
 {
@@ -45,26 +100,9 @@ namespace px
     private:
         GLuint m_Prog = 0;
     public:
-        ShaderImpl(CREFSTR vertexCode, CREFSTR fragmentCode, bool header)
+        ShaderImpl(CREFSTR vertexCode, CREFSTR fragmentCode)
         {
-            std::string frag = fragmentCode;
-            if (header)
-            {
-                frag = __pixl_fragment_header + fragmentCode;
-            }
-
-            Compile(vertexCode, frag);
-        }
-
-        ShaderImpl(CREFSTR fragmentCode, bool header)
-        {
-            std::string frag = fragmentCode;
-            if (header)
-            {
-                frag = __pixl_fragment_header + fragmentCode;
-            }
-
-            Compile(__pixl_vertex, frag);
+            Compile(vertexCode, fragmentCode);
         }
 
         ~ShaderImpl()
@@ -164,14 +202,9 @@ namespace px
     };
 };
 
-px::Shader::Shader(CREFSTR vertexCode, CREFSTR fragmentCode, bool header)
+px::Shader::Shader(CREFSTR vertexCode, CREFSTR fragmentCode)
 {
-    m_Impl = new ShaderImpl(vertexCode, fragmentCode, header);
-}
-
-px::Shader::Shader(CREFSTR fragmentCode, bool header)
-{
-    m_Impl = new ShaderImpl(fragmentCode, header);
+    m_Impl = new ShaderImpl(vertexCode, fragmentCode);
 }
 
 px::Shader::~Shader()
@@ -212,4 +245,16 @@ void px::Shader::SetColor(CREFSTR name, const Color& color)
 void px::Shader::SetInt(CREFSTR name, int value)
 {
     m_Impl->SetInt(name, value);
+}
+
+Shader* px::Shader::Compile(CREFSTR vertexCode, CREFSTR fragmentCode)
+{
+    Shader* shd = new Shader(vertexCode, fragmentCode);
+    if (Error::HasError())
+    {
+        delete shd;
+        return nullptr;
+    }
+
+    return shd;
 }

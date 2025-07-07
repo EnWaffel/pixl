@@ -42,7 +42,7 @@ px::SimpleRenderer::~SimpleRenderer()
 
 void px::SimpleRenderer::Construct()
 {
-    m_Shader = new Shader(__pixl_simple_shader_vert, __pixl_simple_shader_frag, true);
+    m_Shader = ShaderCodeBuilder::NewDefault().BasicVertex().BasicFragment().Compile();
     m_Shader->Use();
     m_Shader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 }

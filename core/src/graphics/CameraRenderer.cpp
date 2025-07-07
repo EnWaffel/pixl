@@ -97,11 +97,11 @@ px::CameraRenderer::~CameraRenderer()
 
 void px::CameraRenderer::Construct()
 {
-    m_SpriteShader = new Shader(__pixl_sprite_shader_frag);
+    m_SpriteShader = ShaderCodeBuilder::NewDefault().BasicVertex().BasicFragment().Compile();
     m_SpriteShader->Use();
     m_SpriteShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 
-    m_TextShader = new Shader(__pixl_text_shader_vert, __pixl_text_shader_frag, true);
+    m_TextShader = ShaderCodeBuilder::NewDefault().BasicVertex().BasicFragment().Compile();
     m_TextShader->Use();
     m_TextShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 

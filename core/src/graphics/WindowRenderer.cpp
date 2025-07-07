@@ -59,7 +59,7 @@ px::WindowRenderer::~WindowRenderer()
 
 void px::WindowRenderer::Construct()
 {
-    m_WindowShader = new Shader(__pixl_window_shader_vert, __pixl_window_shader_frag, true);
+    m_WindowShader = ShaderCodeBuilder::NewDefault().WindowVertex().WindowFragment().Compile();
     m_WindowShader->Use();
 
     m_Wnd->GetEventManager()->AddListener("__pixl_wnd_rend#" + std::to_string((uint64_t)this), PX_EVENT(WINDOW_CHANGED), __pixl_wnd_rend_evt::__pixl_wnd_rend_on_window_event, ListenerPriority::HIGH, this);
