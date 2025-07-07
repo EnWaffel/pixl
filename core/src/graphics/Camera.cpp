@@ -29,16 +29,22 @@ void Camera::Draw(DRAWINGCTX ctx, SHADER spriteShader, SHADER textShader)
 
     DrawData data{};
     data.ctx = ctx;
+    data.projectionMatrix = Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f);
     data.shd = spriteShader;
     data.shd1 = textShader;
     data.offset = pos;
     data.scale = zoom;
+    data.wnd = m_Wnd;
+
+    Mat4 viewMatrix = CalculateViewMatrix();
+
+    data.viewMatrix = viewMatrix;
 
     data.shd->Use();
-    data.shd->SetMatrix4("view_matrix", CalculateViewMatrix());
+    data.shd->SetMatrix4("view_matrix", viewMatrix);
 
     data.shd1->Use();
-    data.shd1->SetMatrix4("view_matrix", CalculateViewMatrix());
+    data.shd1->SetMatrix4("view_matrix", viewMatrix);
 
     for (DRAWABLE drawable : m_Objects)
     {

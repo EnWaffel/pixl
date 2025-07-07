@@ -31,6 +31,7 @@ namespace px
         bool flipY = false;
         TEXTUREATLAS atlas = nullptr;
         SubTexture subTex;
+        SHADER shader = nullptr;
     public:
         PX_API Sprite();
         PX_API Sprite(TEXTURE tex);

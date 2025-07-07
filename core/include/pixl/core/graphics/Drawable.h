@@ -9,17 +9,21 @@
 
 namespace px
 {
+    class Window;
+
     struct PX_API DrawData
     {
         Vec2 offset;
         Vec2 scale;
         DRAWINGCTX ctx;
+        Mat4 projectionMatrix;
         Mat4 viewMatrix;
         void* data;
         SHADER shd; // Sprite Shader
         SHADER shd1; // Text Shader
         SHADER shd2;
         SHADER shd3;
+        Window* wnd;
     };
 
     class Drawable

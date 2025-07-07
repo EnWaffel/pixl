@@ -139,7 +139,15 @@ CREFSTR px::Sprite::GetCurrentAnimationName()
 
 void px::Sprite::Draw(const DrawData& data)
 {
-    data.shd->Use();
+	SHADER shd = shader != nullptr ? shader : data.shd;
+	shd->Use();
+
+	if (shd == shader)
+	{
+		shd->SetMatrix4("projection_matrix", data.projectionMatrix);
+		shd->SetMatrix4("view_matrix", data.viewMatrix);
+		shd->SetVec2("px_resolution", data.wnd->GetFixedSize());
+	}
 
 	Vec2 drawOffset;
 	Vec2 drawUVPos = uvPos;
@@ -171,12 +179,12 @@ void px::Sprite::Draw(const DrawData& data)
 
 	mat.Scale(Vec2(drawSize.x + diff.x, drawSize.y + diff.y));
 
-    data.shd->SetMatrix4("model_matrix", mat);
-	data.shd->SetVec2("px_uv_coord", drawUVPos);
-	data.shd->SetVec2("px_uv_size", drawUVSize);
-	data.shd->SetBool("px_flip_x", flipX);
-	data.shd->SetBool("px_flip_y", flipY);
-	data.shd->SetColor("px_color", color);
+    shd->SetMatrix4("model_matrix", mat);
+	shd->SetVec2("px_uv_coord", drawUVPos);
+	shd->SetVec2("px_uv_size", drawUVSize);
+	shd->SetBool("px_flip_x", flipX);
+	shd->SetBool("px_flip_y", flipY);
+	shd->SetColor("px_color", color);
 
 	if (tex)
 	{
