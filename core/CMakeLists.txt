@@ -50,6 +50,7 @@ src/graphics/SimpleRenderer.cpp
 src/asset/TextureAtlas.cpp
 src/math/Rect.cpp
 src/reflect/Field.cpp
+src/Shaders.cpp
 )
 
 if(PX_VIDEO)

@@ -1,5 +1,6 @@
 #include "pixl/core/graphics/CameraRenderer.h"
 #include "pixl/core/pixl.h"
+#include "pixl/core/Shaders.h"
 
 #include <glad/glad.h>
 
@@ -44,7 +45,7 @@ void px::CameraRenderer::Construct()
     m_SpriteShader->Use();
     m_SpriteShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 
-    m_TextShader = ShaderCodeBuilder::NewDefault().BasicVertex().BasicFragment().Compile();
+    m_TextShader = ShaderCodeBuilder::NewDefault().BasicVertex().Fragment(PX_SHADER_FRAGMENT_TEXT).Compile();
     m_TextShader->Use();
     m_TextShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 

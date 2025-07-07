@@ -40,7 +40,7 @@ px::PostProcessingEffect::~PostProcessingEffect()
 
 void px::PostProcessingEffect::Construct()
 {
-    m_Shader = ShaderCodeBuilder::NewDefault().BasicVertex().Fragment(m_FragmentCode).Compile();;
+    m_Shader = ShaderCodeBuilder::NewDefault().WindowVertex().Fragment(m_FragmentCode).Compile();
     m_Shader->Use();
     m_Shader->SetVec2("px_resolution", m_Wnd->GetFixedSize());
 
