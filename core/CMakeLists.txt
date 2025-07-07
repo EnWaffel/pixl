@@ -77,6 +77,7 @@ include/
 ../dependencies/utfcpp/source/
 ../dependencies/assimp/include/
 ../dependencies/libav/include/
+../dependencies/fmt/include/
 )
 
 if(WIN32)
@@ -92,6 +93,7 @@ if(WIN32)
     bz2
     png16
     zlib
+    fmt
     )
 else()
     set(LIBS
@@ -99,6 +101,7 @@ else()
     glfw
     OpenAL
     freetype
+    fmt
     )
     
 endif()

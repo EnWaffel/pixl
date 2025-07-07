@@ -10,3 +10,6 @@
 [submodule "dependencies/dependencies/utfcpp"]
 	path = dependencies/dependencies/utfcpp
 	url = https://github.com/nemtrif/utfcpp.git
+[submodule "dependencies/fmt"]
+	path = dependencies/fmt
+	url = https://github.com/fmtlib/fmt.git

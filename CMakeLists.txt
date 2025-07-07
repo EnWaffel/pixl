@@ -63,6 +63,20 @@ endif()
 
 # -------------------------
 
+# --- fmt ---
+
+set(FMT_DOC OFF)
+set(FMT_INSTALL OFF)
+set(FMT_TEST OFF)
+set(FMT_FUZZ OFF)
+set(FMT_CUDA_TEST OFF)
+set(FMT_MODULE OFF)
+set(FMT_SYSTEM_HEADERS OFF)
+set(FMT_UNICODE ON)
+add_subdirectory(dependencies/fmt)
+
+# -----------
+
 add_subdirectory(utility)
 add_subdirectory(core)
 
