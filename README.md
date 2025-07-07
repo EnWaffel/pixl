@@ -19,6 +19,7 @@ Documentation can be found [here](https://github.com/EnWaffel/pixl/wiki).
 - Tweening
 - Multiple windows
 - Fully integrated Video Player (libav / ffmpeg)
+- A Reflection-like system
 - And more!
 
 ### Toggleable features
