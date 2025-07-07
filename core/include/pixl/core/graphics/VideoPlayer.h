@@ -43,7 +43,7 @@ namespace px
         /**
          * managed: Should the video player be automatically deleted when pixl ends?
          */
-        static PX_API VIDPLAYER Create(CREFSTR path, bool managed = true, uint8_t frameBufferSize = 1);
+        static PX_API VIDPLAYER Create(CREFSTR path, bool managed = true, uint8_t frameBufferSize = 4);
         static PX_API void Destroy(VIDPLAYER player);
     private:
         VideoPlayerImpl* m_Impl;
