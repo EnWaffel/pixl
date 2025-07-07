@@ -1,7 +1,6 @@
 #include "pixl/core/asset/AudioBuffer.h"
 #include "pixl/utility/Error.h"
 
-#define AL_LIBTYPE_STATIC
 #include <AL/al.h>
 #include <stb_vorbis.c>
 #include <iostream>
