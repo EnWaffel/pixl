@@ -11,7 +11,7 @@
     Predefined uniforms and vars (only in shaders that are built with header on!):
 
     px_texture - input texture
-    px_color - blend color
+    px_color - color
     px_uv_coord - texture uv coord
     px_uv_size - texture uv size
     px_flip_x - flag, whether the output should be flipped on the x axis
