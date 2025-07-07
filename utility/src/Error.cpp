@@ -127,3 +127,9 @@ CREFSTR px::Error::GetErrorMessage()
 {
     return __pixl__cur_error_message;
 }
+
+void px::Error::Clear()
+{
+    __pixl__cur_error_code = PX_SUCCESS;
+    __pixl__cur_error_message.clear();
+}

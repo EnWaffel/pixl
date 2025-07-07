@@ -6,6 +6,7 @@
 
 #define PX_NOERROR px::Error()
 #define PX_SUCCESS 0
+#define PX_NO_ERROR -1
 
 #define PX_ERROR 0x90
 #define PX_ERROR_INVALID_OPERATION 0x91
@@ -30,5 +31,6 @@ namespace px
         PX_API static bool HasError();
         PX_API static uint64_t GetErrorCode();
         PX_API static CREFSTR GetErrorMessage();
+        PX_API static void Clear();
     };
 }
