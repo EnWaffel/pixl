@@ -18,10 +18,7 @@ static std::vector<WINDOW> windows;
 Error px::Init(const InitOptions& opts)
 {
     __pixl_opts = opts;
-    if (opts.errorLogging)
-    {
-        __pixl_error_log_errors = true;
-    }
+    __pixl_error_log_errors = opts.errorLogging;
 
     if (glfwInit() != GLFW_TRUE)
     {
@@ -64,6 +61,8 @@ void px::End()
 
 WINDOW px::CreateWindow(CREFSTR title, const Vec2i& size, bool startVisible, bool decorated)
 {
+    Error::Clear();
+
     WINDOW wnd = new Window(title, size, startVisible, decorated);
     wnd->PostInit();
 
