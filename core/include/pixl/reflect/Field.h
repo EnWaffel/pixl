@@ -11,7 +11,6 @@
 #include <functional>
 #include <memory>
 
-#define PX_R_INVALID_FIELD { "", 0, nullptr, false }
 // Use for custom setters and getters
 #define PX_R_DECL_FIELD_CUSTOM(f, t, s, g) RegisterField<t>(#f, std::make_shared<px::Field<t>>(px::Field<t>(#f, typeid(f).hash_code(), &f, std::is_base_of<px::FieldAccessor, t>::value, s, g)))
 #define PX_R_DECL_FIELD(f, t) RegisterField<t>(#f, std::make_shared<px::Field<t>>(px::Field<t>(#f, typeid(f).hash_code(), &f, std::is_base_of<px::FieldAccessor, t>::value, px::BasicFieldSetter<t>, px::BasicFieldGetter<t>)))
