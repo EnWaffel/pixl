@@ -2,29 +2,6 @@
 #include "pixl/core/pixl.h"
 
 #include <glad/glad.h>
-#include <iostream>
-
-static const char* __pixl_window_shader_vert = R"(
-#version 330 core
-
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 texCoord;
-
-out vec2 px_uv;
-
-void main()
-{
-    gl_Position = vec4(pos, 1.0);
-    px_uv = texCoord;
-}
-)";
-
-static const char* __pixl_window_shader_frag = R"(
-void main()
-{
-    gl_FragColor = texture(px_texture, px_uv);
-}
-)";
 
 using namespace px;
 

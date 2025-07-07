@@ -102,6 +102,8 @@ void main()
 		uv.y = 1.0 - uv.y;
 	}
 
-    gl_FragColor = vec4(1.0, 1.0, 1.0, texture(px_texture, uv).r) * px_color;
+    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(px_texture, uv).r);
+    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * sampled;
+    gl_FragColor *= px_color;
 }
 )";

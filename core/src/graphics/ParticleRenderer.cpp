@@ -2,7 +2,6 @@
 #include "pixl/core/pixl.h"
 
 #include <glad/glad.h>
-#include <iostream>
 
 using namespace px;
 

@@ -2,63 +2,6 @@
 #include "pixl/core/pixl.h"
 
 #include <glad/glad.h>
-#include <iostream>
-
-static const char* __pixl_sprite_shader_frag = R"(
-void main()
-{
-	vec2 uv = px_uv;
-	if (px_flip_x)
-	{
-		uv.x = 1.0 - uv.x;
-	}
-	if (px_flip_y)
-	{
-		uv.y = 1.0 - uv.y;
-	}
-
-    vec4 c = texture(px_texture, uv * px_uv_size + px_uv_coord);
-    gl_FragColor = c * px_color;
-}
-)";
-
-static const char* __pixl_text_shader_vert = R"(
-#version 330 core
-
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 texCoord;
-
-out vec2 px_uv;
-
-uniform mat4 projection_matrix;
-uniform mat4 view_matrix;
-uniform mat4 model_matrix;
-
-void main()
-{
-	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(pos, 1.0);
-	px_uv = texCoord;
-}
-)";
-
-static const char* __pixl_text_shader_frag = R"(
-void main()
-{
-	vec2 uv = px_uv;
-	if (px_flip_x)
-	{
-		uv.x = 1.0 - uv.x;
-	}
-	if (px_flip_y)
-	{
-		uv.y = 1.0 - uv.y;
-	}
-
-    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(px_texture, uv).r);
-    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * sampled;
-    gl_FragColor *= px_color;
-}
-)";
 
 using namespace px;
 
