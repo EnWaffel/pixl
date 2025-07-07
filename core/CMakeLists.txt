@@ -49,6 +49,7 @@ src/graphics/PostProcessingEffect.cpp
 src/graphics/SimpleRenderer.cpp
 src/asset/TextureAtlas.cpp
 src/math/Rect.cpp
+src/reflect/Field.cpp
 )
 
 if(PX_VIDEO)

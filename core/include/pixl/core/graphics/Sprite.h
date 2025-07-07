@@ -7,12 +7,13 @@
 #include "pixl/utility/Axis.h"
 #include "pixl/core/tween/Tweenable.h"
 #include "pixl/core/asset/TextureAtlas.h"
+#include "pixl/reflect/Field.h"
 
 #include <unordered_map>
 
 namespace px
 {
-    class PX_API Sprite : public Drawable, public Tweenable
+    class PX_API Sprite : public FieldAccessor, public Drawable, public Tweenable
     {
     public:
         Vec2 pos;

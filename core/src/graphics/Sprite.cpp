@@ -9,6 +9,22 @@ extern WINDOW __pixl_rootwnd;
 
 px::Sprite::Sprite() : subTex({ {}, {}, {}, {}, 0.0f })
 {
+	PX_R_DECL_FIELD(pos, Vec2);
+	PX_R_DECL_FIELD(size, Vec2);
+	PX_R_DECL_FIELD(scale, Vec2);
+	PX_R_DECL_FIELD(offset, Vec2);
+	PX_R_DECL_FIELD(pivotPoint, Vec2);
+	PX_R_DECL_FIELD(scrollFactor, float);
+	PX_R_DECL_FIELD(tex, TEXTURE);
+	PX_R_DECL_FIELD(color, Color);
+	PX_R_DECL_FIELD(uvPos, Vec2);
+	PX_R_DECL_FIELD(uvSize, Vec2);
+	PX_R_DECL_FIELD(flipX, bool);
+	PX_R_DECL_FIELD(flipY, bool);
+	PX_R_DECL_FIELD(atlas, TEXTUREATLAS);
+	PX_R_DECL_FIELD(subTex, SubTexture);
+	PX_R_DECL_FIELD(order, int);
+	PX_R_DECL_FIELD(visible, bool);
 }
 
 px::Sprite::Sprite(TEXTURE tex) : Sprite()
