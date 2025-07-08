@@ -252,7 +252,7 @@ Error px::AssetPackage::PackDirectory(CREFSTR path, CREFSTR outPath)
         entries.push_back(entry);
     }
 
-    std::ofstream o(outPath);
+    std::ofstream o(outPath, std::ios::binary);
     if (!o.is_open())
     {
         Error::Throw(PX_ERROR_APKG_FILE, "Can't open output file");
@@ -273,7 +273,8 @@ Error px::AssetPackage::PackDirectory(CREFSTR path, CREFSTR outPath)
     uint32_t fileCount = entries.size();
     o.write(reinterpret_cast<char*>(&fileCount), sizeof(fileCount));
 
-    uint64_t startOffset = o.tellp() + locTableSize;
+    uint64_t startOffset = o.tellp();
+    startOffset += locTableSize;
     for (const FileEntry& entry : entries)
     {
         std::string filename = entry.filename;
@@ -290,9 +291,10 @@ Error px::AssetPackage::PackDirectory(CREFSTR path, CREFSTR outPath)
     {
         o.write(reinterpret_cast<const char*>(&entry.size), sizeof(entry.size));
 
-        std::ifstream i(entry.path);
-        if (!i.is_open())
+        std::ifstream in(entry.path, std::ios::binary);
+        if (!in.is_open())
         {
+            PX_DEBUG_LOG("AssetPackage::PackDirectory()", "Failed to open file: %s", entry.path);
             uint8_t zero = 0;
             for (uint64_t i = 0; i < entry.size; i++)
             {
@@ -300,15 +302,15 @@ Error px::AssetPackage::PackDirectory(CREFSTR path, CREFSTR outPath)
             }
             continue;
         }
-        
-        char buf[4096];
-        while (i.read(buf, sizeof(buf)))
-        {
-            o.write(buf, i.gcount());
-        }
-        o.write(buf, i.gcount());
 
-        i.close();
+        char buf[4096];
+        while (in.read(buf, sizeof(buf)))
+        {
+            o.write(buf, in.gcount());
+        }
+        o.write(buf, in.gcount());
+
+        in.close();
     }
 
     o.close();
