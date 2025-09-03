@@ -1,8 +1,10 @@
 #include "pixl/core/window/Window.h"
 #include "pixl/core/pixl.h"
 #include "pixl/core/graphics/RenderPipeline.h"
-#include "pixl/core/graphics/CameraRenderer.h"
-#include "pixl/core/graphics/WindowRenderer.h"
+#include "pixl/core/graphics/2d/CameraRenderer.h"
+#include "pixl/core/graphics/2d/WindowRenderer.h"
+#include "pixl/core/graphics/3d/Camera3DRenderer.h"
+#include "pixl/core/input/Keys.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -70,6 +72,7 @@ static void _glfw_framebuffer_resize(GLFWwindow* window, int width, int height);
 static void _glfw_keycallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void _glfw_mousebuttoncallback(GLFWwindow* window, int button, int action, int mods);
 static void _glfw_cursorposcallback(GLFWwindow* window, double xpos, double ypos);
+static void _glfw_scrollcallback(GLFWwindow* window, double xoffset, double yoffset);
 
 namespace px
 {
@@ -87,6 +90,9 @@ namespace px
         Vec2i m_ViewportPos;
         Vec2i m_ViewportSize;
         CAMERA m_StaticCamera;
+        std::vector<CAMERA3D> m_Cameras3D;
+        GLFWmonitor* m_Monitor;
+        bool m_VSync = false;
     public:
         WindowImpl(WINDOW parent, CREFSTR title, const Vec2i& size, bool startVisible, bool decorated) : m_Parent(parent), m_InitialSize(size)
         {
@@ -99,14 +105,13 @@ namespace px
 			glfwWindowHint(GLFW_DECORATED, decorated);
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
-            GLFWmonitor* primaryMonitor;
 #ifdef PX_WIN
-            primaryMonitor = glfwGetPrimaryMonitor();
+            m_Monitor = glfwGetPrimaryMonitor();
 #elif defined(PX_UNIX)
             GLFWmonitor** monitors;
             int count;
             monitors = glfwGetMonitors(&count);
-            primaryMonitor = monitors[0];
+            m_Monitor = monitors[0];
 #endif
 
             PX_DEBUG_LOG("WindowImpl::WindowImpl()", "Creating window: (parent: 0x%x) title: %s | width: %d | height: %d | startVisible: %s | decorated: %s", parent, title.c_str(), size.x, size.y, startVisible ? "true" : "false", decorated ? "true" : "false");
@@ -132,21 +137,11 @@ namespace px
             glfwSetKeyCallback(m_Handle, _glfw_keycallback);
             glfwSetMouseButtonCallback(m_Handle, _glfw_mousebuttoncallback);
             glfwSetCursorPosCallback(m_Handle, _glfw_cursorposcallback);
+            glfwSetScrollCallback(m_Handle, _glfw_scrollcallback);
 
             m_ViewportSize = size;
 
-            const GLFWvidmode* vidmode = glfwGetVideoMode(primaryMonitor);
-
-#ifdef PX_WIN
-            glfwSetWindowPos(m_Handle, vidmode->width / 2 - size.x / 2, vidmode->height / 2 - size.y / 2);
-#elif defined(PX_UNIX)
-            int monitorX, monitorY;
-            glfwGetMonitorPos(primaryMonitor, &monitorX, &monitorY);
-            int windowX = monitorX + (vidmode->width - size.x) / 2;
-            int windowY = monitorY + (vidmode->height - size.y) / 2;
-
-            glfwSetWindowPos(m_Handle, windowX, windowY);
-#endif
+            Center();
 
             if (!__pixl_rootwnd)
             {
@@ -180,6 +175,11 @@ namespace px
                 delete camera;
             }
 
+            for (CAMERA3D camera : m_Cameras3D)
+            {
+                delete camera;
+            }
+
             delete m_StaticCamera;
             delete m_DrawingContext;
             delete m_Pipeline;
@@ -199,11 +199,18 @@ namespace px
             m_StaticCamera = new Camera(m_Parent);
             AddCamera(new Camera(m_Parent)); // default camera
 
+            m_Cameras3D.push_back(new Camera3D(m_Parent));
+
             WindowChangedData data{};
             data.viewportPos = { 0, 0 };
             data.viewportSize = m_InitialSize;
         
             m_EventManager->CallEvent(PX_EVENT(WINDOW_CHANGED), data);
+
+            if (__pixl_rootwnd == m_Parent)
+            {
+                Keys::Init(m_Parent);
+            }
         }
 
         void* GetHandle()
@@ -235,6 +242,7 @@ namespace px
             if (__pixl_rootwnd == m_Parent)
             {
                 __pixl_timer_update(delta);
+                Keys::Update();
             }
 
             m_StaticCamera->Update(delta);
@@ -255,7 +263,7 @@ namespace px
             glfwMakeContextCurrent(m_Handle);
 
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             m_Pipeline->Flush();
 
@@ -311,6 +319,21 @@ namespace px
         void Close()
         {
             glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
+        }
+
+        void Center()
+        {
+            const GLFWvidmode* vidmode = glfwGetVideoMode(m_Monitor);
+#ifdef PX_WIN
+            glfwSetWindowPos(m_Handle, vidmode->width / 2 - m_InitialSize.x / 2, vidmode->height / 2 - m_InitialSize.y / 2);
+#elif defined(PX_UNIX)
+            int monitorX, monitorY;
+            glfwGetMonitorPos(primaryMonitor, &monitorX, &monitorY);
+            int windowX = monitorX + (vidmode->width - m_InitialSize.x) / 2;
+            int windowY = monitorY + (vidmode->height - m_InitialSize.y) / 2;
+
+            glfwSetWindowPos(m_Handle, windowX, windowY);
+#endif
         }
     };
 };
@@ -391,6 +414,17 @@ static void _glfw_cursorposcallback(GLFWwindow* window, double xpos, double ypos
     wnd->GetEventManager()->CallEvent(PX_EVENT(MOUSE_MOVE), data);
 }
 
+static void _glfw_scrollcallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    WindowImpl* wnd = (WindowImpl*)glfwGetWindowUserPointer(window);
+
+    MouseScrollEvent data{};
+    data.x = xoffset;
+    data.y = yoffset;
+
+    wnd->GetEventManager()->CallEvent(PX_EVENT(MOUSE_SCROLL), data);
+}
+
 px::Window::Window(CREFSTR title, const Vec2i& size, bool startVisible, bool decorated)
 {
     m_Impl = new WindowImpl(this, title, size, startVisible, decorated);
@@ -414,6 +448,29 @@ bool px::Window::ShouldClose()
 const std::vector<CAMERA> px::Window::GetCameras()
 {
     return m_Impl->GetCameras();
+}
+
+const std::vector<CAMERA3D> px::Window::GetCameras3D()
+{
+    return m_Impl->m_Cameras3D;
+}
+
+CAMERA3D px::Window::GetDefaultCamera3D()
+{
+    if (m_Impl->m_Cameras3D.empty()) return nullptr;
+    return m_Impl->m_Cameras3D.front();
+}
+
+void px::Window::AddCamera3D(CAMERA3D camera)
+{
+    m_Impl->m_Cameras3D.push_back(camera);
+}
+
+void px::Window::RemoveCamera3D(CAMERA3D camera)
+{
+    auto it = std::find(m_Impl->m_Cameras3D.begin(), m_Impl->m_Cameras3D.end(), camera);
+    if (it == m_Impl->m_Cameras3D.end()) return;
+    m_Impl->m_Cameras3D.erase(it);
 }
 
 void px::Window::AddCamera(CAMERA camera)
@@ -480,6 +537,20 @@ void px::Window::SetSize(const Vec2i& size)
     glfwSetWindowSize(m_Impl->m_Handle, size.x, size.y);
 }
 
+void px::Window::SetFullscreen(bool fullscreen)
+{
+    if (fullscreen)
+    {
+        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwSetWindowMonitor(m_Impl->m_Handle, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0 );
+    }
+    else
+    {
+        glfwSetWindowMonitor(m_Impl->m_Handle, nullptr, 0, 0, m_Impl->m_InitialSize.x, m_Impl->m_InitialSize.y, GLFW_DONT_CARE);
+        m_Impl->Center();
+    }
+}
+
 RENDERPIPELINE px::Window::GetRenderPipeline()
 {
     return m_Impl->m_Pipeline;
@@ -492,7 +563,7 @@ void px::Window::SetRenderPipeline(RENDERPIPELINE pipeline)
     
     WindowChangedData data{};
     data.viewportPos = m_Impl->m_ViewportPos;
-    data.viewportSize = m_Impl->m_InitialSize;
+    data.viewportSize = m_Impl->m_ViewportSize;
 
     m_Impl->m_EventManager->CallEvent(PX_EVENT(WINDOW_CHANGED), data);
 }
@@ -500,6 +571,15 @@ void px::Window::SetRenderPipeline(RENDERPIPELINE pipeline)
 RENDERPIPELINE px::Window::CreateDefaultPipeline()
 {
     RENDERPIPELINE pipeline = new RenderPipeline(this);
+    pipeline->AddElement("cam", new CameraRenderer);
+    pipeline->AddElement("wnd", new WindowRenderer);
+    return pipeline;
+}
+
+RENDERPIPELINE px::Window::CreateDefault3DPipeline()
+{
+    RENDERPIPELINE pipeline = new RenderPipeline(this);
+    pipeline->AddElement("3d", new Camera3DRenderer);
     pipeline->AddElement("cam", new CameraRenderer);
     pipeline->AddElement("wnd", new WindowRenderer);
     return pipeline;
@@ -513,6 +593,33 @@ CAMERA px::Window::GetStaticCamera()
 void px::Window::Close()
 {
     m_Impl->Close();
+}
+
+void px::Window::DisableCursor()
+{
+    glfwSetInputMode(m_Impl->m_Handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void px::Window::EnableCursor()
+{
+    glfwSetInputMode(m_Impl->m_Handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void px::Window::ShowCursor()
+{
+    EnableCursor();
+}
+
+void px::Window::SetVSync(bool enabled)
+{
+    m_Impl->m_VSync = enabled;
+    glfwMakeContextCurrent(m_Impl->m_Handle);
+    glfwSwapInterval(enabled);
+}
+
+void px::Window::HideCursor()
+{
+    glfwSetInputMode(m_Impl->m_Handle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void px::Window::Update(float delta)

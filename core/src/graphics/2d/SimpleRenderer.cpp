@@ -1,33 +1,7 @@
-#include "pixl/core/graphics/SimpleRenderer.h"
+#include "pixl/core/graphics/2d/SimpleRenderer.h"
 #include "pixl/core/pixl.h"
 
 #include <glad/glad.h>
-#include <iostream>
-
-static const char* __pixl_simple_shader_vert = R"(
-#version 330 core
-
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 texCoord;
-
-out vec2 px_uv;
-
-uniform mat4 projection_matrix;
-uniform mat4 model_matrix;
-
-void main()
-{
-	gl_Position = projection_matrix * model_matrix * vec4(pos, 1.0);
-	px_uv = texCoord;
-}
-)";
-
-static const char* __pixl_simple_shader_frag = R"(
-void main()
-{
-    gl_FragColor = px_color;
-}
-)";
 
 using namespace px;
 
@@ -76,6 +50,7 @@ void px::SimpleRenderer::DrawRect(const Vec2& pos, const Vec2& size, const Color
 
     m_Shader->SetMatrix4("model_matrix", mat);
     m_Shader->SetColor("px_color", color);
+    m_Shader->SetBool("px_only_color", true);
 
     m_Ctx->DrawQuadOutline();
 }

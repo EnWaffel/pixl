@@ -1,4 +1,4 @@
-#include "pixl/core/graphics/Camera.h"
+#include "pixl/core/graphics/2d/Camera.h"
 #include "pixl/core/window/Window.h"
 #include "pixl/core/pixl.h"
 
@@ -28,23 +28,25 @@ void Camera::Draw(DRAWINGCTX ctx, SHADER spriteShader, SHADER textShader)
     if (!visible) return;
 
     DrawData data{};
-    data.ctx = ctx;
-    data.projectionMatrix = Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f);
-    data.shd = spriteShader;
-    data.shd1 = textShader;
-    data.offset = pos;
-    data.scale = zoom;
-    data.wnd = m_Wnd;
-
     Mat4 viewMatrix = CalculateViewMatrix();
 
+    data.wnd = m_Wnd;
+    data.ctx = ctx;
+
+    data.offset = pos;
+    data.scale = zoom;
+
+    data.projectionMatrix = Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f);
     data.viewMatrix = viewMatrix;
 
-    data.shd->Use();
-    data.shd->SetMatrix4("view_matrix", viewMatrix);
+    data.shaders[PX_SHD_IDX_SPRITE] = spriteShader;
+    data.shaders[PX_SHD_IDX_TEXT] = textShader;
 
-    data.shd1->Use();
-    data.shd1->SetMatrix4("view_matrix", viewMatrix);
+    spriteShader->Use();
+    spriteShader->SetMatrix4("view_matrix", viewMatrix);
+
+    textShader->Use();
+    textShader->SetMatrix4("view_matrix", viewMatrix);
 
     for (DRAWABLE drawable : m_Objects)
     {
@@ -91,10 +93,15 @@ void px::Camera::Reorder()
         }
     }
 
-    std::sort(sorted.begin(), sorted.end(), [](Drawable* d1, Drawable* d2) { return d1->order > d2->order; });
+    std::sort(sorted.begin(), sorted.end(), [](Drawable* d1, Drawable* d2) { return d1->order < d2->order; });
 
     for (Drawable* d : sorted) sorted1.push_back(d);
     m_Objects = sorted1;
+}
+
+void px::Camera::RemoveAll()
+{
+    m_Objects.clear();
 }
 
 TW px::Camera::TweenZoom(float to, float duration, const Easing::EasingFunc &easing, float delay, const TweenCompleteCallback &callback)

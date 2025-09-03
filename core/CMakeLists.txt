@@ -4,14 +4,7 @@ project(pixl-core VERSION 0.0.1)
 
 add_compile_options(-Wall)
 add_compile_definitions(-DPX_EXPORTS)
-add_compile_definitions(-DPX_DEBUG)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
-add_compile_options(-static-libstdc++)
-add_compile_options(-static-libgcc)
-add_compile_options(-static)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 
 set(SRC
 src/Core.cpp
@@ -26,9 +19,9 @@ src/math/Vec3.cpp
 src/math/Mat4.cpp
 src/math/MathFunctions.cpp
 src/graphics/DrawingContext.cpp
-src/graphics/CameraRenderer.cpp
-src/graphics/Camera.cpp
-src/graphics/Sprite.cpp
+src/graphics/2d/CameraRenderer.cpp
+src/graphics/2d/Camera.cpp
+src/graphics/2d/Sprite.cpp
 src/asset/AssetPackage.cpp
 src/asset/AssetManager.cpp
 src/asset/Texture.cpp
@@ -37,31 +30,36 @@ src/asset/AudioBuffer.cpp
 src/sound/Sound.cpp
 src/animation/loader/SparrowAtlasLoader.cpp
 src/animation/Animation.cpp
-src/graphics/WindowRenderer.cpp
+src/graphics/2d/WindowRenderer.cpp
 src/event/EventManager.cpp
 src/tween/Tweenable.cpp
 src/tween/Easing.cpp
 src/input/KeyCode.cpp
 src/asset/Font.cpp
-src/graphics/Text.cpp
-src/graphics/SpriteGroup.cpp
+src/graphics/2d/Text.cpp
+src/graphics/2d/SpriteGroup.cpp
 src/graphics/PostProcessingEffect.cpp
-src/graphics/SimpleRenderer.cpp
+src/graphics/2d/SimpleRenderer.cpp
 src/asset/TextureAtlas.cpp
 src/math/Rect.cpp
 src/reflect/Field.cpp
 src/Shaders.cpp
+src/input/Keys.cpp
+src/graphics/3d/Skybox.cpp
+src/asset/CubeMap.cpp
 )
 
 if(PX_VIDEO)
-    list(APPEND SRC src/graphics/VideoPlayer.cpp)
+    list(APPEND SRC src/graphics/2d/VideoPlayer.cpp)
 endif()
 
 if(PX_3D)
+    add_compile_definitions(-DPX_3D)
     list(APPEND SRC
         src/asset/Model.cpp
-        src/graphics/Camera3DRenderer.cpp
-        src/graphics/Camera3D.cpp
+        src/graphics/3d/Camera3DRenderer.cpp
+        src/graphics/3d/Camera3D.cpp
+        src/graphics/3d/Object3D.cpp
     )
 endif()
 

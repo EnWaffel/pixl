@@ -1,4 +1,5 @@
 #include "pixl/core/math/Vec2.h"
+#include "pixl/core/math/Vec2i.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -14,6 +15,10 @@ px::Vec2::Vec2(float x, float y) : x(x), y(y)
 }
 
 px::Vec2::Vec2(float v) : x(v), y(v)
+{
+}
+
+px::Vec2::Vec2(const Vec2i& vec) : x(vec.x), y(vec.y)
 {
 }
 

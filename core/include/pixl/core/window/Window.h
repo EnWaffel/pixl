@@ -3,7 +3,7 @@
 #include "pixl/utility/Defs.h"
 #include "pixl/utility/Error.h"
 #include "pixl/core/math/Vec2i.h"
-#include "pixl/core/graphics/Camera.h"
+#include "pixl/core/graphics/2d/Camera.h"
 #include "pixl/core/event/EventManager.h"
 #include "pixl/core/graphics/RenderPipeline.h"
 
@@ -37,11 +37,22 @@ namespace px
         PX_API Vec2i GetPosition();
         PX_API void SetPosition(const Vec2i& pos);
         PX_API void SetSize(const Vec2i& size);
+        PX_API void SetFullscreen(bool fullscreen);
         PX_API RENDERPIPELINE GetRenderPipeline();
         PX_API void SetRenderPipeline(RENDERPIPELINE pipeline);
         PX_API RENDERPIPELINE CreateDefaultPipeline();
+        PX_API RENDERPIPELINE CreateDefault3DPipeline();
         PX_API CAMERA GetStaticCamera();
+        PX_API const std::vector<CAMERA3D> GetCameras3D();
+        PX_API CAMERA3D GetDefaultCamera3D();
+        PX_API void AddCamera3D(CAMERA3D camera);
+        PX_API void RemoveCamera3D(CAMERA3D camera);
         PX_API void Close();
+        PX_API void DisableCursor();
+        PX_API void EnableCursor();
+        PX_API void HideCursor();
+        PX_API void ShowCursor();
+        PX_API void SetVSync(bool enabled);
 
         PX_API void Update(float delta);
         PX_API void UpdateEvents(float delta);

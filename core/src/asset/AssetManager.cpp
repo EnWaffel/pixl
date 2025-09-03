@@ -25,6 +25,7 @@ static std::unordered_map<std::string, AUDIOBUF> __audio_buffers;
 static std::unordered_map<std::string, FONT> __fonts;
 static std::unordered_map<std::string, MODEL> __models;
 static std::unordered_map<std::string, TEXTUREATLAS> __atlases;
+static std::unordered_map<std::string, CUBEMAP> __cubemaps;
 
 static bool EndsWith(CREFSTR filename, CREFSTR ext) {
     if (filename.length() < ext.length()) return false;
@@ -162,6 +163,12 @@ void px::AssetManager::End()
         delete v.second;
     }
 
+    for (const auto& v : __cubemaps)
+    {
+        PX_DEBUG_LOG("AssetManager::End()", "Releasing cubemap: %s", v.first.c_str());
+        delete v.second;
+    }
+
     if (__ft) FT_Done_FreeType(__ft);
 }
 
@@ -178,7 +185,7 @@ void px::AssetManager::SetPreferPackages(bool flag)
 
 std::unique_ptr<std::istream> px::AssetManager::GetStream(CREFSTR path)
 {
-    return std::move(_GetStream(path));
+    return _GetStream(path);
 }
 
 TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasing, bool reload, bool manage)
@@ -192,60 +199,18 @@ TEXTURE px::AssetManager::LoadTexture(CREFSTR id, CREFSTR path, bool antialiasin
         delete __textures.at(id);
         __textures.erase(id);
     }
-
-    std::unique_ptr<std::istream> stream = GetStream(path);
-    if (!stream)
-    {
-        Error::Throw(PX_ERROR_ASSET_NOT_AVAILABLE, "No file / stream found for: " + path);
-        return nullptr;
-    }
-
-    stbi_io_callbacks ioCallbacks{};
-
-    ioCallbacks.read = [](void* user, char* data, int size) -> int
-    {
-        std::istream* s = (std::istream*)user;
-        s->read(data, size);
-        return s->gcount();
-    };
-
-    ioCallbacks.skip = [](void* user, int n) -> void
-    {
-        std::istream* s = (std::istream*)user;
-        s->seekg(n, std::ios::cur);
-    };
-
-    ioCallbacks.eof = [](void* user) -> int
-    {
-        std::istream* s = (std::istream*)user;
-        return s->eof();
-    };
-
-    stbi_set_flip_vertically_on_load(false);
-
-    int width, height, channels;
-    stbi_uc* data = stbi_load_from_callbacks(&ioCallbacks, stream.get(), &width, &height, &channels, 4);
-    if (!data)
-    {
-        Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, "Failed to read image data from: " + path);
-        return nullptr;
-    }
     
-    ImageData img{};
-    img.data = data;
-    img.width = width;
-    img.height = height;
-    img.size = width * height * 4;
-    img.format = ImageFormat::RGBA;
+    ImageData img = LoadImage(path);
+    if (!img.data) return nullptr;
 
     TEXTURE tex = LoadTexture(id, img, antialiasing, reload, manage);
     if (!tex)
     {
-        stbi_image_free(data);
+        stbi_image_free(img.data);
         return nullptr;
     }
 
-    stbi_image_free(data);
+    stbi_image_free(img.data);
 
     return tex;
 }
@@ -326,6 +291,56 @@ TEXTURE px::AssetManager::LoadTexture(CREFSTR id, const ImageData& img, bool ant
     if (manage) __textures.insert({ id, texture });
 
     return texture;
+}
+
+ImageData px::AssetManager::LoadImage(CREFSTR path)
+{
+    std::unique_ptr<std::istream> stream = GetStream(path);
+    if (!stream)
+    {
+        Error::Throw(PX_ERROR_ASSET_NOT_AVAILABLE, "No file / stream found for: " + path);
+        return { nullptr, 0, 0, 0, (ImageFormat)-1 };
+    }
+
+    stbi_io_callbacks ioCallbacks{};
+
+    ioCallbacks.read = [](void* user, char* data, int size) -> int
+    {
+        std::istream* s = (std::istream*)user;
+        s->read(data, size);
+        return s->gcount();
+    };
+
+    ioCallbacks.skip = [](void* user, int n) -> void
+    {
+        std::istream* s = (std::istream*)user;
+        s->seekg(n, std::ios::cur);
+    };
+
+    ioCallbacks.eof = [](void* user) -> int
+    {
+        std::istream* s = (std::istream*)user;
+        return s->eof();
+    };
+
+    stbi_set_flip_vertically_on_load(false);
+
+    int width, height, channels;
+    stbi_uc* data = stbi_load_from_callbacks(&ioCallbacks, stream.get(), &width, &height, &channels, 4);
+    if (!data)
+    {
+        Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, "Failed to read image data from: " + path);
+        return { nullptr, 0, 0, 0, (ImageFormat)-1 };
+    }
+    
+    ImageData img{};
+    img.data = data;
+    img.width = width;
+    img.height = height;
+    img.size = width * height * 4;
+    img.format = ImageFormat::RGBA;
+
+    return img;
 }
 
 AUDIOBUF px::AssetManager::LoadSound(CREFSTR id, CREFSTR path, bool reload)
@@ -473,7 +488,7 @@ MODEL px::AssetManager::LoadModel(CREFSTR id, CREFSTR path, bool antialiasing, b
         return nullptr;
     }
     
-    MODEL model = Model::Load(id, PX_ASTREAM_REF(stream));
+    MODEL model = Model::Load(id, PX_ASTREAM_REF(stream), antialiasing);
     if (!model)
     {
         Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, "Failed to load model: " + path);
@@ -502,6 +517,67 @@ TEXTUREATLAS px::AssetManager::LoadAtlas(CREFSTR id, CREFSTR path, const AtlasMe
     __atlases.insert({ id, atlas });
 
     return atlas;
+}
+
+CUBEMAP px::AssetManager::LoadCubeMap(CREFSTR id, CREFSTR right, CREFSTR left, CREFSTR top, CREFSTR bottom, CREFSTR front, CREFSTR back, bool antialiasing, bool reload)
+{
+    if (__cubemaps.count(id) > 0 && !reload)
+    {
+        return __cubemaps.at(id);
+    }
+    else if (__cubemaps.count(id) > 0 && reload)
+    {
+        delete __cubemaps.at(id);
+        __cubemaps.erase(id);
+    }
+
+    std::string faces[6] = {
+        right,
+        left,
+        top,
+        bottom,
+        front,
+        back
+    };
+
+    unsigned int tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+    for (unsigned int i = 0; i < 6; i++)
+    {
+        ImageData data = LoadImage(faces[i]);
+        if (!data.data)
+        {
+            Error::Throw(PX_ERROR_ASSET_LOAD_FAILED, "Failed to load cubemap face: " + faces[i]);
+            glDeleteTextures(1, &tex);
+            return nullptr;
+        }
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, data.width, data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data);
+
+        stbi_image_free(data.data);
+    }
+
+    if (antialiasing)
+    {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+    
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    CUBEMAP cubemap = new CubeMap(tex);
+    __cubemaps.insert({ id, cubemap });
+
+    return cubemap;
 }
 
 TEXTURE px::AssetManager::GetTexture(CREFSTR id)

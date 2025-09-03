@@ -21,22 +21,7 @@ namespace px
         virtual bool IsCanceled() = 0;
         virtual void Cancel() = 0;
     };
-
-    /*
-     T m_From;
-        T m_To;
-        T* m_Ptr;
-        float m_Duration;
-        Easing::EasingFunc m_Easing;
-        float m_Delay;
-        float m_DelayElapsed;
-        T m_Current;
-        bool m_Canceled;
-        float m_Elapsed;
-        float m_Progress;
-        TweenCompleteCallback m_OnComplete;
-    */
-
+    
     template<typename T>
     class Tween : public TweenBase
     {

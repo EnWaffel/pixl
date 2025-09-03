@@ -1,4 +1,4 @@
-#include "pixl/core/graphics/SpriteGroup.h"
+#include "pixl/core/graphics/2d/SpriteGroup.h"
 
 #include <algorithm>
 

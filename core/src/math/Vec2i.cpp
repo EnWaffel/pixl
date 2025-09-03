@@ -17,6 +17,10 @@ px::Vec2i::Vec2i(int v) : x(v), y(v)
 {
 }
 
+px::Vec2i::Vec2i(const Vec2& vec) : x(vec.x), y(vec.y)
+{
+}
+
 Vec2i px::Vec2i::operator+(const Vec2i &other)
 {
     return Vec2i(x + other.x, y + other.y);

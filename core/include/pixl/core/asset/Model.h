@@ -12,7 +12,9 @@ namespace px
     enum class MeshTextureType
     {
         DIFFUSE,
-        SPECULAR
+        SPECULAR,
+        NORMALS,
+        HEIGHT
     };
 
     struct Vertex
@@ -20,6 +22,8 @@ namespace px
         Vec3 pos;
         Vec3 normal;
         Vec2 texCoord;
+        Vec3 tangent;
+        Vec3 bitangent;
     };
 
     struct MeshTexture
@@ -37,6 +41,7 @@ namespace px
         unsigned int data[3];
     };
     
+    class Object3D;
     class Model;
     typedef Model* MODEL;
 
@@ -46,9 +51,11 @@ namespace px
         PX_INTERNAL Model();
         PX_INTERNAL ~Model();
 
-        PX_API static MODEL Load(CREFSTR modelName, std::istream& stream);
+        PX_API static MODEL Load(CREFSTR modelName, std::istream& stream, bool antialiasing);
         PX_API static Mesh CreateMesh();
-    private:
+    protected:
         std::vector<Mesh> m_Meshes;
+
+    friend class Object3D;
     };
 }

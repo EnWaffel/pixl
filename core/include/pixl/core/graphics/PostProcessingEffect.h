@@ -6,7 +6,7 @@
 #include "pixl/core/graphics/Shader.h"
 #include "pixl/core/graphics/Framebuffer.h"
 #include "pixl/core/math/Vec2i.h"
-#include "pixl/core/graphics/Camera.h"
+#include "pixl/core/graphics/2d/Camera.h"
 
 #include <vector>
 

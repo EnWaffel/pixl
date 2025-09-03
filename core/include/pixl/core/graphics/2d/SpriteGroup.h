@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pixl/core/graphics/Drawable.h"
-#include "pixl/core/graphics/Sprite.h"
+#include "pixl/core/graphics/2d/Sprite.h"
 
 #include <vector>
 

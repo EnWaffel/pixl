@@ -183,6 +183,23 @@ bool px::AssetPackage::HasFile(CREFSTR path)
     return m_LocationTable.count(path) > 0;
 }
 
+const std::unordered_map<std::string, uint64_t>& px::AssetPackage::GetLocationTable()
+{
+    return m_LocationTable;
+}
+
+std::vector<std::string> px::AssetPackage::GetFilesInDirectory(CREFSTR dir)
+{
+    std::vector<std::string> list;
+
+    for (const auto& v : m_LocationTable)
+    {
+        if (v.first.compare(0, dir.length(), dir) == 0) list.push_back(v.first);
+    }
+
+    return list;
+}
+
 static uint64_t GetFileSize(const fs::path &file)
 {
     return fs::file_size(file);
@@ -208,7 +225,7 @@ APKG px::AssetPackage::OpenPackage(CREFSTR path)
 {
     if (!fs::exists(path))
     {
-        Error::Throw(PX_ERROR_APKG_FILE, "Couldn't find directory to pack");
+        Error::Throw(PX_ERROR_APKG_FILE, "Couldn't find asset package (" + path + ")");
         return nullptr;
     }
 

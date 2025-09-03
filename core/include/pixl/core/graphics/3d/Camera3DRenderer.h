@@ -21,6 +21,7 @@ namespace px
         PX_API PipelineData Downstream(const PipelineData& data) override;
     private:
         SHADER m_ObjectShader;
+        SHADER m_SkyboxShader;
         FRAMEBUF m_Framebuf;
         Vec2i m_ViewportSize;
 

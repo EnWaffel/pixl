@@ -13,8 +13,8 @@ namespace px
         float w;
         float h;
     public:
-        Rect();
-        Rect(float x, float y, float w, float h);
+        PX_API Rect();
+        PX_API Rect(float x, float y, float w, float h);
     };
 #pragma pack(pop)
 }

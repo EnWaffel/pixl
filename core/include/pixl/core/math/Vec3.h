@@ -13,6 +13,7 @@ namespace px
 		float z;
 	public:
 		PX_API Vec3();
+		PX_API Vec3(float v);
 		PX_API Vec3(float x, float y, float z);
 
 		PX_API Vec3 operator+(const Vec3& other);
@@ -44,6 +45,7 @@ namespace px
 		PX_API Vec3 Cross(const Vec3& other) const;
 
 		PX_API float Distance(const Vec3& other);
+		PX_API float Length();
 	};
 #pragma pack(pop)
 }

@@ -7,6 +7,7 @@
 #include "pixl/core/graphics/Drawable.h"
 #include "pixl/core/graphics/Shader.h"
 #include "pixl/core/tween/Tweenable.h"
+#include "pixl/core/graphics/3d/Skybox.h"
 
 #include <vector>
 
@@ -19,19 +20,26 @@ namespace px
     {
     public:
         Vec3 pos;
-        float yaw = -90.0f;
+        Vec3 offset;
+        float yaw = 0.0f;
         float pitch = 0.0f;
+        float roll = 0.0f;
         float fov = 45.0f;
+        float yawOffset = 0.0f;
+        float pitchOffset = 0.0f;
+        float rollOffset = 0.0f;
+        Skybox* skybox = nullptr;
     public:
         PX_API Camera3D(WINDOW window);
 
         PX_API void Update(float delta);
-        PX_API void Draw(DRAWINGCTX ctx, SHADER objectShader);
+        PX_API void Draw(DRAWINGCTX ctx, SHADER objectShader, SHADER skyboxShader);
         PX_API void Add(DRAWABLE drawable);
         PX_API void Add(Drawable& drawable);
         PX_API void Remove(DRAWABLE drawable);
         PX_API void Remove(Drawable& drawable);
         PX_API void Reorder();
+        PX_API void RemoveAll();
 
         PX_API TW TweenFOV(float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenFOV(float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
@@ -47,6 +55,7 @@ namespace px
     private:
         std::vector<DRAWABLE> m_Objects;
         WINDOW m_Wnd;
+    public:
         Vec3 m_Front;
         Vec3 m_Up;
         Vec3 m_Right;

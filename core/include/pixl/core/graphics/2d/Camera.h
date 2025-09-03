@@ -33,6 +33,7 @@ namespace px
         PX_API void Remove(DRAWABLE drawable);
         PX_API void Remove(Drawable& drawable);
         PX_API void Reorder();
+        PX_API void RemoveAll();
 
         PX_API TW TweenZoom(float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);
         PX_API TW TweenZoom(float from, float to, float duration, const Easing::EasingFunc& easing, float delay = 0.0f, const TweenCompleteCallback& callback = nullptr);

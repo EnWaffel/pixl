@@ -9,6 +9,10 @@ px::Vec3::Vec3() : x(0.0f), y(0.0f), z(0.0f)
 {
 }
 
+px::Vec3::Vec3(float v) : x(v), y(v), z(v)
+{
+}
+
 px::Vec3::Vec3(float x, float y, float z) : x(x), y(y), z(z)
 {
 }
@@ -161,4 +165,9 @@ Vec3 px::Vec3::Cross(const Vec3& other) const
 float px::Vec3::Distance(const Vec3& other)
 {
     return sqrtf(powf((other.x - x), 2) + powf(other.y - y, 2));
+}
+
+float px::Vec3::Length()
+{
+    return sqrtf(x * x + y * y + z * z);
 }

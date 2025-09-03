@@ -17,16 +17,16 @@
 #include "pixl/core/asset/Texture.h"
 #include "pixl/core/event/Event.h"
 #include "pixl/core/event/EventManager.h"
-#include "pixl/core/graphics/Camera.h"
-#include "pixl/core/graphics/CameraRenderer.h"
+#include "pixl/core/graphics/2d/Camera.h"
+#include "pixl/core/graphics/2d/CameraRenderer.h"
 #include "pixl/core/graphics/Drawable.h"
 #include "pixl/core/graphics/DrawingContext.h"
 #include "pixl/core/graphics/Framebuffer.h"
 #include "pixl/core/graphics/PipelineElement.h"
 #include "pixl/core/graphics/RenderPipeline.h"
 #include "pixl/core/graphics/Shader.h"
-#include "pixl/core/graphics/Sprite.h"
-#include "pixl/core/graphics/WindowRenderer.h"
+#include "pixl/core/graphics/2d/Sprite.h"
+#include "pixl/core/graphics/2d/WindowRenderer.h"
 #include "pixl/core/math/Mat4.h"
 #include "pixl/core/math/MathFunctions.h"
 #include "pixl/core/math/Vec2.h"
@@ -39,15 +39,17 @@
 #include "pixl/core/tween/Tween.h"
 #include "pixl/core/tween/Tweenable.h"
 #include "pixl/core/tween/Easing.h"
-#include "pixl/core/graphics/Text.h"
+#include "pixl/core/graphics/2d/Text.h"
 #include "pixl/core/asset/Font.h"
-#include "pixl/core/graphics/VideoPlayer.h"
-#include "pixl/core/graphics/SpriteGroup.h"
+#include "pixl/core/graphics/2d/VideoPlayer.h"
+#include "pixl/core/graphics/2d/SpriteGroup.h"
 #include "pixl/core/graphics/PostProcessingEffect.h"
-#include "pixl/core/graphics/SimpleRenderer.h"
+#include "pixl/core/graphics/2d/SimpleRenderer.h"
+#include "pixl/core/input/Keys.h"
 
 #define PX_ERROR_GLFW 0x20
 #define PX_ERROR_SERVICE 0x21
+#define PX_ERROR_OPENGL 0x22
 
 namespace px
 {

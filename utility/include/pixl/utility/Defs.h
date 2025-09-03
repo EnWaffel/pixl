@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <iostream>
 
+// Mostly pixl internal definitions
+
 #define PX_VERSION { 1, 0 }
 #define PX_OPENGL_VERSION_MAJOR 4
 #define PX_OPENGL_VERSION_MINOR 3
@@ -48,7 +50,7 @@ namespace px
     typedef const std::string& CREFSTR;
     struct VERSION
     {
-        uint8_t minor;
         uint8_t major;
+        uint8_t minor;
     };
 };

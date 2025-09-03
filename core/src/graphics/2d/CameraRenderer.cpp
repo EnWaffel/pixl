@@ -1,4 +1,4 @@
-#include "pixl/core/graphics/CameraRenderer.h"
+#include "pixl/core/graphics/2d/CameraRenderer.h"
 #include "pixl/core/pixl.h"
 #include "pixl/core/Shaders.h"
 
@@ -59,6 +59,8 @@ PipelineData px::CameraRenderer::Downstream(const PipelineData& data)
     if (!data.camera) return data;
 
     m_Framebuf->Bind();
+
+    glDisable(GL_DEPTH_TEST);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);

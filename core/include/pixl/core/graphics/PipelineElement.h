@@ -3,8 +3,8 @@
 #include "pixl/utility/Defs.h"
 #include "pixl/utility/Error.h"
 #include "pixl/core/math/Vec2.h"
-#include "pixl/core/graphics/Camera.h"
-#include "pixl/core/graphics/Camera3D.h"
+#include "pixl/core/graphics/2d/Camera.h"
+#include "pixl/core/graphics/3d/Camera3D.h"
 #include "pixl/core/graphics/DrawingContext.h"
 #include "pixl/core/graphics/Framebuffer.h"
 

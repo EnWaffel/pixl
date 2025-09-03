@@ -106,8 +106,7 @@ namespace px
 
         void Flush()
         {
-            /*
-            for (CAMERA3D camera : m_Wnd->GetCameras())
+            for (CAMERA3D camera : m_Wnd->GetCameras3D())
             {
                 PipelineData data{};
                 data.camera = nullptr;
@@ -122,7 +121,6 @@ namespace px
                     data = e->Downstream(data);
                 }
             }
-            */
             
             for (CAMERA camera : m_Wnd->GetCameras())
             {

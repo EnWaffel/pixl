@@ -7,23 +7,40 @@
 #include "pixl/core/graphics/DrawingContext.h"
 #include "pixl/core/graphics/Shader.h"
 
+#include <vector>
+
+#define PX_SHD_IDX_SPRITE 0
+#define PX_SHD_IDX_TEXT 1
+#define PX_SHD_IDX_OBJECT 0
+#define PX_SHD_IDX_SKYBOX 1
+
 namespace px
 {
     class Window;
 
     struct PX_API DrawData
     {
+        Window* wnd;
+        DRAWINGCTX ctx;
+        // Camera values
         Vec2 offset;
         Vec2 scale;
-        DRAWINGCTX ctx;
+        // Matrices
         Mat4 projectionMatrix;
         Mat4 viewMatrix;
+        /**
+         * Indices:
+         * 
+         * 2D:
+         *   0 = Sprite Shader
+         *   1 = Text Shader
+         * 3D:
+         *   0 = Object Shader
+         *   1 = Skybox Shader
+         */
+        SHADER shaders[8];
+        // Userdata
         void* data;
-        SHADER shd; // Sprite Shader
-        SHADER shd1; // Text Shader
-        SHADER shd2;
-        SHADER shd3;
-        Window* wnd;
     };
 
     class Drawable

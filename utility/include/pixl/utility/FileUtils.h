@@ -10,8 +10,17 @@
 
 namespace px
 {
-    namespace FileUtils
+    class FileUtils
     {
+    public:
+        /**
+         * @brief Combines multiple path sections into one full path with the OS's separator. (e.g.: CombinePaths("assets", "images", "beans.png") will become "assets/images/beans.png")
+         * 
+         * @param first First part of the path.
+         * @param other Other parts of the path.
+         * 
+         * @returns The combined path.
+         */
         template<typename... Paths>
         static std::string CombinePaths(CREFSTR first, const Paths&... other)
         {
@@ -35,5 +44,8 @@ namespace px
 
             return combined.str();
         }
-    }
+
+        PX_API static bool FileExists(CREFSTR path);
+        PX_API static bool DirectoryExists(CREFSTR path);
+    };
 }

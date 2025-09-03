@@ -1,4 +1,4 @@
-#include "pixl/core/graphics/Sprite.h"
+#include "pixl/core/graphics/2d/Sprite.h"
 #include "pixl/core/window/Window.h"
 
 #include <glad/glad.h>
@@ -139,7 +139,7 @@ CREFSTR px::Sprite::GetCurrentAnimationName()
 
 void px::Sprite::Draw(const DrawData& data)
 {
-	SHADER shd = shader != nullptr ? shader : data.shd;
+	SHADER shd = shader != nullptr ? shader : data.shaders[PX_SHD_IDX_SPRITE];
 	shd->Use();
 
 	if (shd == shader)

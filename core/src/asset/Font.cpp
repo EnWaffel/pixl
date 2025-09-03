@@ -1,9 +1,11 @@
 #include "pixl/core/asset/Font.h"
+#include "pixl/core/math/Vec3.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <glad/glad.h>
 #include <utf8.h>
+#include <vector>
 
 using namespace px;
 
@@ -110,8 +112,17 @@ Vec2 px::Font::GetSize(const UTFString& str, float scale)
     int maxAscent = 0;
     int maxDescent = 0;
 
+    std::vector<float> lines;
+
     for (UTFChar c : str) {
         const Glyph& g = GetCharData(c);
+
+        if (c == '\n')
+        {
+            lines.push_back(width);
+            width = 0.0f;
+            continue;
+        }
 
         width += (float)(g.advance.x) / 64.0f;
 
@@ -120,6 +131,11 @@ Vec2 px::Font::GetSize(const UTFString& str, float scale)
 
         if (ascent > maxAscent) maxAscent = ascent;
         if (descent > maxDescent) maxDescent = descent;
+    }
+
+    for (float w : lines)
+    {
+        if (w > width) width = w;
     }
 
     return Vec2(width * scale, (maxAscent + maxDescent) * scale);

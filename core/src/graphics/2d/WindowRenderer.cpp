@@ -1,4 +1,4 @@
-#include "pixl/core/graphics/WindowRenderer.h"
+#include "pixl/core/graphics/2d/WindowRenderer.h"
 #include "pixl/core/pixl.h"
 
 #include <glad/glad.h>
@@ -47,7 +47,7 @@ PipelineData px::WindowRenderer::Downstream(const PipelineData& data)
     if (!data.prevBuf) return data;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glViewport(m_ViewportPos.x, m_ViewportPos.y, m_ViewportSize.x, m_ViewportSize.y);
 

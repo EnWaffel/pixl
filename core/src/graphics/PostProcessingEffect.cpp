@@ -59,6 +59,8 @@ PipelineData px::PostProcessingEffect::Downstream(const PipelineData& data)
 
     m_Framebuf->Bind();
 
+    glDisable(GL_DEPTH_TEST);
+
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
 

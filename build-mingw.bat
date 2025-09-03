@@ -7,5 +7,5 @@ if not exist "build\release" (
 )
 
 cd build\release
-cmake -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ../../
-mingw32-make
+cmake -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" -DPX_VIDEO=ON -DPX_3D=ON ../../
+mingw32-make -j8

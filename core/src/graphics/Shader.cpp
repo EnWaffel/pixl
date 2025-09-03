@@ -60,6 +60,12 @@ ShaderCodeBuilder px::ShaderCodeBuilder::WindowVertex()
     return *this;
 }
 
+ShaderCodeBuilder px::ShaderCodeBuilder::Vertex(CREFSTR code)
+{
+    m_VCode += code;
+    return *this;
+}
+
 ShaderCodeBuilder px::ShaderCodeBuilder::BasicFragment()
 {
     m_FCode += PX_SHADER_FRAGMENT_HEADER;

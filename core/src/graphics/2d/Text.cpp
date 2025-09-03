@@ -1,4 +1,4 @@
-#include "pixl/core/graphics/Text.h"
+#include "pixl/core/graphics/2d/Text.h"
 #include "pixl/core/window/Window.h"
 
 #include <glad/glad.h>
@@ -71,7 +71,7 @@ void px::Text::Center(Axis axis, const Vec2& parentSize)
 	}
 	if (axis == Y || axis == XY)
 	{
-		pos.y = parentSize.y / 2.0f - size.y / 2.0f;
+		pos.y = parentSize.y / 2.0f + size.y / 2.0f;
 	}
 }
 
@@ -79,12 +79,13 @@ void px::Text::Draw(const DrawData& data)
 {
     if (!fnt) return;
 
-    data.shd1->Use();
+    SHADER shd = data.shaders[PX_SHD_IDX_TEXT];
+    shd->Use();
 
-	data.shd1->SetBool("px_flip_x", flipX);
-	data.shd1->SetBool("px_flip_y", flipY);
-    data.shd1->SetColor("px_color", color);
-    
+	shd->SetBool("px_flip_x", flipX);
+	shd->SetBool("px_flip_y", flipY);
+    shd->SetColor("px_color", color);
+
     float offsetX = 0.0f;
     float offsetY = 0.0f;
     for (UTFChar c : m_Text)
@@ -97,15 +98,6 @@ void px::Text::Draw(const DrawData& data)
         }
 
         Glyph g = fnt->GetCharData(c);
-        Mat4 mat;
-
-        /*
-        float x = pos.x + offsetX + g.bearing.x;
-        float y = pos.y + offsetY - g.bearing.y;
-
-        mat.Translate(Vec2(x, y));
-        mat.Scale(g.size * scale);
-        */
 
         Vec2 _pos = pos;
         _pos.x -= data.offset.x * data.scale.x;
@@ -117,6 +109,8 @@ void px::Text::Draw(const DrawData& data)
         float w = g.size.x * scale;
         float h = g.size.y * scale;
 
+        Mat4 mat;
+
         mat.Translate(Vec2(x, y));
         mat.Translate(offset);
 
@@ -126,7 +120,7 @@ void px::Text::Draw(const DrawData& data)
 
         mat.Scale(Vec2(w, h));
 
-        data.shd1->SetMatrix4("model_matrix", mat);
+        shd->SetMatrix4("model_matrix", mat);
 
         glBindTexture(GL_TEXTURE_2D, g.data);
         data.ctx->DrawQuad();
@@ -139,6 +133,7 @@ void px::Text::Draw(const DrawData& data)
 
 void px::Text::Update(float delta)
 {
+    UpdateTweens(delta);
 }
 
 TW px::Text::TweenPos(const Vec2& to, float duration, const Easing::EasingFunc& easing, float delay, const TweenCompleteCallback& callback)

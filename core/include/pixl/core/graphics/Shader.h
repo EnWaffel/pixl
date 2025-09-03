@@ -55,6 +55,7 @@ namespace px
         PX_API ShaderCodeBuilder Version(ShaderProfile profile = ShaderProfile::CORE, int major = PX_OPENGL_VERSION_MAJOR, int minor = PX_OPENGL_VERSION_MINOR);
         PX_API ShaderCodeBuilder BasicVertex();
         PX_API ShaderCodeBuilder WindowVertex();
+        PX_API ShaderCodeBuilder Vertex(CREFSTR code);
         PX_API ShaderCodeBuilder BasicFragment();
         PX_API ShaderCodeBuilder WindowFragment();
         PX_API ShaderCodeBuilder Fragment(CREFSTR code, bool header = true);

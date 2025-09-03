@@ -18,7 +18,8 @@ namespace px
         MOUSE_PRESS = 1ULL << 2,
         MOUSE_RELEASE = 1ULL << 3,
         MOUSE_MOVE = 1ULL << 4,
-        WINDOW_CHANGED = 1ULL << 5
+        WINDOW_CHANGED = 1ULL << 5,
+        MOUSE_SCROLL = 1ULL << 6
     };
 
     struct EventData
@@ -43,6 +44,12 @@ namespace px
     };
 
     struct MouseMoveEvent : public EventData
+    {
+        float x;
+        float y;
+    };
+
+    struct MouseScrollEvent : public EventData
     {
         float x;
         float y;

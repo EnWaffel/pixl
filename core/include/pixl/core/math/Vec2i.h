@@ -15,6 +15,7 @@ namespace px
         PX_API Vec2i();
 		PX_API Vec2i(int x, int y);
 		PX_API Vec2i(int v);
+		PX_API Vec2i(const Vec2& vec);
 
 		PX_API Vec2i operator+(const Vec2i& other);
 		PX_API Vec2i operator+(int v);

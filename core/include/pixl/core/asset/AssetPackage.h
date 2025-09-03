@@ -10,6 +10,7 @@
 #include <istream>
 #include <algorithm>
 #include <memory>
+#include <vector>
 
 #define PX_APKG_VERSION 1
 
@@ -33,13 +34,16 @@
  	File:
  
  	? + ?  | 8    | uint64   | ?     | file size
- 	?+?+8  | ?    | int8     | ?     | file data
+ 	?+?+8  | ?    | byte     | ?     | file data
 */
 
 #define PX_ERROR_APKG_FILE 0x80
 
 namespace px
 {
+    /**
+     * @brief A buffer for a limited region inside a file.
+     */
     class PackageBuffer : public std::streambuf
     {
     public:
@@ -56,6 +60,9 @@ namespace px
         std::streampos m_End;
     };
 
+    /**
+     * An input stream from an Asset Package.
+     */
     class PackageStream : public std::istream
     {
     public:
@@ -68,6 +75,9 @@ namespace px
     class AssetPackage;
     typedef AssetPackage* APKG;
 
+    /**
+     * @brief An Asset Package is basically a zip file without the compression and the zip standard.
+     */
     class AssetPackage
     {
     public:
@@ -77,13 +87,33 @@ namespace px
         PX_API std::unique_ptr<PackageStream> OpenStream(CREFSTR path);
         PX_API void SaveToFile(CREFSTR path, CREFSTR outPath);
         PX_API bool HasFile(CREFSTR path);
+        PX_API const std::unordered_map<std::string, uint64_t>& GetLocationTable();
+        PX_API std::vector<std::string> GetFilesInDirectory(CREFSTR dir);
     private:
         std::string m_Path;
         std::ifstream m_Stream;
         std::unordered_map<std::string, uint64_t> m_LocationTable;
     public:
+        /**
+         * @brief Opens a package from a file path.
+         * 
+         * @param path The path to the package.
+         */
         PX_API static APKG OpenPackage(CREFSTR path);
+        /**
+         * @brief Closes an Asset Package.
+         * 
+         * @param package The package to close
+         */
         PX_API static void ClosePackage(APKG package);
+        /**
+         * @brief Packs an entire directory recursively into a .apkg file.
+         * 
+         * @param path The path of the directory to pack.
+         * @param outPath The path of the output file.
+         *
+         * @return Returns PX_SUCCESS or an error code.
+         */
         PX_API static Error PackDirectory(CREFSTR path, CREFSTR outPath);
     };
 }

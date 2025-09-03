@@ -4,6 +4,7 @@
 
 namespace px
 {
+	class Vec2i;
 #pragma pack(push, 1)
     class Vec2
 	{
@@ -14,6 +15,7 @@ namespace px
         PX_API Vec2();
 		PX_API Vec2(float x, float y);
 		PX_API Vec2(float v);
+		PX_API Vec2(const Vec2i& vec);
 
 		PX_API Vec2 operator+(const Vec2& other);
 		PX_API Vec2 operator+(float v);

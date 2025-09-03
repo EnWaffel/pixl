@@ -14,6 +14,14 @@ namespace px
         PX_INTERNAL SparrowAtlasLoader() = delete;
         PX_INTERNAL ~SparrowAtlasLoader() = delete;
 
+        /**
+         * @brief Loads all frames from a Sparrow Atlas into a map.
+         * 
+         * @param path The path to the xml file.
+         * @param tex The texture for the atlas.
+         * 
+         * @return A map containing the data of all frames in the atlas.
+         */
         PX_API static ANIMFRAMES Load(CREFSTR path, TEXTURE tex);
     };
 }

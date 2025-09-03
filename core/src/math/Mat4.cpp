@@ -138,6 +138,20 @@ Mat4 px::Mat4::Ortho(float left, float right, float bottom, float top)
 
 Mat4 px::Mat4::Perspective(float fov, float aspect, float near, float far)
 {
+	float tanHalfFovy = tan(Math::ToRadians(fov) / 2.0f);
+
+	Mat4 mat;
+	mat(0, 0) = 1.0f / (aspect * tanHalfFovy);
+	mat(1, 1) = 1.0f / tanHalfFovy;
+	mat(2, 2) = -(far + near) / (far - near);
+	mat(2, 3) = -1.0f;
+	mat(3, 2) = -(2.0f * far * near) / (far - near);
+	mat(3, 3) = 0.0f;
+
+	return mat;
+}
+
+/*
 	float fovRad = Math::ToRadians(fov);
 	float tanHalfFov = tanf(fovRad / 2.0f);
 
@@ -150,29 +164,63 @@ Mat4 px::Mat4::Perspective(float fov, float aspect, float near, float far)
 	perspectiveMatrix(3, 3) = 0.0f;
 
 	return perspectiveMatrix;
-}
+*/
 
 Mat4 px::Mat4::LookAt(const Vec3& eye, const Vec3& center, const Vec3& up)
 {
-	Vec3 zAxis = eye;
-	zAxis -= center;
-	zAxis = zAxis.Normalize();
-	Vec3 xAxis = up.Cross(zAxis).Normalize();
-	Vec3 yAxis = zAxis.Cross(xAxis);
+	Vec3 temp = center;
+	temp -= eye;
+	Vec3 f = temp.Normalize();
+	Vec3 s = f.Cross(up).Normalize();
+	Vec3 u = s.Cross(f);
 
-	Mat4 lookAtMatrix;
-	lookAtMatrix(0, 0) = xAxis.x;
-	lookAtMatrix(0, 1) = xAxis.y;
-	lookAtMatrix(0, 2) = xAxis.z;
-	lookAtMatrix(1, 0) = yAxis.x;
-	lookAtMatrix(1, 1) = yAxis.y;
-	lookAtMatrix(1, 2) = yAxis.z;
-	lookAtMatrix(2, 0) = zAxis.x;
-	lookAtMatrix(2, 1) = zAxis.y;
-	lookAtMatrix(2, 2) = zAxis.z;
-	lookAtMatrix(3, 0) = -xAxis.Dot(eye);
-	lookAtMatrix(3, 1) = -yAxis.Dot(eye);
-	lookAtMatrix(3, 2) = -zAxis.Dot(eye);
+	Mat4 mat;
 
-	return lookAtMatrix;
+	mat(0, 0) = s.x;
+	mat(1, 0) = s.y;
+	mat(2, 0) = s.z;
+	mat(0, 1) = u.x;
+	mat(1, 1) = u.y;
+	mat(2, 1) = u.z;
+	mat(0, 2) = -f.x;
+	mat(1, 2) = -f.y;
+	mat(2, 2) = -f.z;
+	mat(3, 0) = -s.Dot(eye);
+	mat(3, 1) = -u.Dot(eye);
+	mat(3, 2) = f.Dot(eye);
+
+	return mat;
 }
+
+/*
+Vec3 temp = eye;
+	temp -= center;
+    Vec3 zAxis = temp.Normalize();  // Camera forward
+    Vec3 xAxis = up.Cross(zAxis).Normalize(); // Camera right
+    Vec3 yAxis = zAxis.Cross(xAxis);          // Camera up
+
+    Mat4 lookAtMatrix;
+
+    // Rotation (basis vectors) - column-major
+    lookAtMatrix(0, 0) = xAxis.x;
+    lookAtMatrix(1, 0) = xAxis.y;
+    lookAtMatrix(2, 0) = xAxis.z;
+    lookAtMatrix(3, 0) = -xAxis.Dot(eye);
+
+    lookAtMatrix(0, 1) = yAxis.x;
+    lookAtMatrix(1, 1) = yAxis.y;
+    lookAtMatrix(2, 1) = yAxis.z;
+    lookAtMatrix(3, 1) = -yAxis.Dot(eye);
+
+    lookAtMatrix(0, 2) = zAxis.x;
+    lookAtMatrix(1, 2) = zAxis.y;
+    lookAtMatrix(2, 2) = zAxis.z;
+    lookAtMatrix(3, 2) = -zAxis.Dot(eye);
+
+    lookAtMatrix(0, 3) = 0.0f;
+    lookAtMatrix(1, 3) = 0.0f;
+    lookAtMatrix(2, 3) = 0.0f;
+    lookAtMatrix(3, 3) = 1.0f;
+
+    return lookAtMatrix;
+*/

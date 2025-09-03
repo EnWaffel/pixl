@@ -1,4 +1,4 @@
-#include "pixl/core/graphics/VideoPlayer.h"
+#include "pixl/core/graphics/2d/VideoPlayer.h"
 #include "pixl/core/asset/AssetManager.h"
 #include "pixl/core/window/Window.h"
 
@@ -658,6 +658,8 @@ namespace px
         {
             if (m_Stopped) return;
 
+            SHADER shd = data.shaders[PX_SHD_IDX_SPRITE];
+
             Frame& frame = m_FrameHandler->GetFrame();
             GLuint tex = frame.tex;
 
@@ -666,14 +668,14 @@ namespace px
                 m_FrameHandler->AdvanceFrames();
             }
 
-            data.shd->Use();
+            shd->Use();
 
-            data.shd->SetMatrix4("model_matrix", mat);
-            data.shd->SetVec2("px_uv_coord", Vec2());
-            data.shd->SetVec2("px_uv_size", Vec2(1.0f, 1.0f));
-            data.shd->SetBool("px_flip_x", false);
-            data.shd->SetBool("px_flip_y", false);
-            data.shd->SetColor("px_color", Color());
+            shd->SetMatrix4("model_matrix", mat);
+            shd->SetVec2("px_uv_coord", Vec2());
+            shd->SetVec2("px_uv_size", Vec2(1.0f, 1.0f));
+            shd->SetBool("px_flip_x", false);
+            shd->SetBool("px_flip_y", false);
+            shd->SetColor("px_color", Color());
 
             glBindTexture(GL_TEXTURE_2D, tex);
 
