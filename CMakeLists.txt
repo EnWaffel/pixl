@@ -77,6 +77,23 @@ add_subdirectory(dependencies/fmt)
 
 # -----------
 
+# --- msdfgen ---
+
+set(MSDFGEN_CORE_ONLY OFF)
+set(MSDFGEN_BUILD_STANDALONE OFF)
+set(MSDFGEN_USE_VCPKG OFF)
+set(MSDFGEN_USE_OPENMP OFF)
+set(MSDFGEN_USE_CPP11 ON)
+set(MSDFGEN_USE_SKIA OFF)
+set(MSDFGEN_DISABLE_SVG ON)
+set(MSDFGEN_DISABLE_PNG ON)
+set(MSDFGEN_INSTALL ON)
+set(MSDFGEN_DYNAMIC_RUNTIME OFF)
+set(BUILD_SHARED_LIBS OFF)
+add_subdirectory(dependencies/msdfgen)
+
+# ---------------
+
 add_subdirectory(utility)
 add_subdirectory(core)
 

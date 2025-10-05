@@ -13,3 +13,6 @@
 [submodule "dependencies/fmt"]
 	path = dependencies/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "dependencies/msdfgen"]
+	path = dependencies/msdfgen
+	url = https://github.com/Chlumsky/msdfgen.git
