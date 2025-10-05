@@ -3,6 +3,7 @@
 #include "pixl/utility/Defs.h"
 #include "pixl/core/math/Vec3.h"
 #include "pixl/core/math/Vec2.h"
+#include "pixl/core/math/Mat4.h"
 #include "pixl/core/asset/Texture.h"
 
 #include <vector>
@@ -39,6 +40,7 @@ namespace px
         std::vector<unsigned int> indices;
         std::vector<MeshTexture> textures;
         unsigned int data[3];
+        Mat4 transformation;
     };
     
     class Object3D;
