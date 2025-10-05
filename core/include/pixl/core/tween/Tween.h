@@ -39,7 +39,8 @@ namespace px
         m_Canceled(false),
         m_Elapsed(0.0f),
         m_Progress(0.0f),
-        m_OnComplete(onComplete) 
+        m_OnComplete(onComplete),
+        m_Started(false)
         {
         }
 
@@ -56,7 +57,8 @@ namespace px
         m_Canceled(false),
         m_Elapsed(0.0f),
         m_Progress(0.0f),
-        m_OnComplete(onComplete)
+        m_OnComplete(onComplete),
+        m_Started(false)
         {
         }
 
@@ -69,6 +71,12 @@ namespace px
 				m_DelayElapsed += delta;
 				return;
 			}
+            else if (!m_Started)
+            {
+                m_Started = true;
+                m_From = *m_Ptr;
+                m_Current = *m_Ptr;
+            }
 
 			m_Elapsed += delta;
 			m_Progress = std::fminf(m_Elapsed / m_Duration, 1.0f);
@@ -111,6 +119,7 @@ namespace px
         float m_Elapsed;
         float m_Progress;
         TweenCompleteCallback m_OnComplete;
+        bool m_Started;
     };
 
     typedef TweenBase* TW;
