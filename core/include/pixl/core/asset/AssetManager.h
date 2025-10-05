@@ -94,13 +94,13 @@ namespace px
          * 
          * @param id An identifier for the loaded asset.
          * @param path The path to the font.
-         * @param size The size of the font in pixels.
+         * @param baseSize The base size of the font in pixels.
          * @param antialiasing false for pixel art.
          * @param reload Whether to reload the cached asset.
          * 
          * @return A new font object or nullptr.
          */
-        PX_API static FONT LoadFont(CREFSTR id, CREFSTR path, uint16_t size = 24, bool antialiasing = true, bool reload = false);
+        PX_API static FONT LoadFont(CREFSTR id, CREFSTR path, FontType type = FontType::MSDF, uint16_t baseSize = 32, bool antialiasing = true, bool reload = false);
 #ifdef PX_3D
         /**
          * @brief Loads a 3D Model from an Asset Package or system directory.

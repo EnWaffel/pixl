@@ -19,12 +19,25 @@ namespace px
         Vec2 pivotPoint = Vec2(0.5f, 0.5f);
         float rotation = 0.0f;
         Vec2 scrollFactor;
-		FONT fnt;
-		Color color;
-        float scale = 1.0f;
-        float lineSpacing = 3.0f;
         bool flipX = false;
         bool flipY = false;
+
+		FONT fnt;
+
+		Color bgColor = PX_TRANSPARENT;
+        Color fgColor = PX_WHITE;
+        Color outlineColor = PX_TRANSPARENT;
+        Color glowColor = PX_TRANSPARENT;
+
+        float scale = 1.0f; // For bitmap fonts
+        float textSize = 24.0f; // For msdf fonts
+        float lineSpacing = 3.0f;
+
+        float outlineWidth = 0.0f;
+        float smoothingFactor = 0.25f;
+
+        float glowSize = 0.0f;
+        float glowIntensity = 0.0f;
     public:
         PX_API Text();
         PX_API Text(FONT fnt, const UTFString& text);
@@ -36,9 +49,13 @@ namespace px
         PX_API UTFString GetText();
         PX_API void Center(Axis axis);
         PX_API void Center(Axis axis, const Vec2& parentSize);
+        PX_API void UpdateText();
 
         PX_API void Draw(const DrawData& data) override;
         PX_API void Update(float delta) override;
+
+        PX_INTERNAL void DrawMSDF(const DrawData& data);
+        PX_INTERNAL void DrawBitmap(const DrawData& data);
 
         // You could call this a Twon of functions! ;-)
 

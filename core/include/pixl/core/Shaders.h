@@ -29,6 +29,7 @@ extern const char* PX_SHADER_VERTEX_SKYBOX;
 extern const char* PX_SHADER_FRAGMENT_HEADER;
 extern const char* PX_SHADER_FRAGMENT_BASIC;
 extern const char* PX_SHADER_FRAGMENT_WINDOW;
-extern const char* PX_SHADER_FRAGMENT_TEXT;
+extern const char* PX_SHADER_FRAGMENT_TEXT_MSDF;
+extern const char* PX_SHADER_FRAGMENT_TEXT_BITMAP;
 extern const char* PX_SHADER_FRAGMENT_3D;
 extern const char* PX_SHADER_FRAGMENT_SKYBOX;

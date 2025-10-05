@@ -10,7 +10,8 @@
 #include <vector>
 
 #define PX_SHD_IDX_SPRITE 0
-#define PX_SHD_IDX_TEXT 1
+#define PX_SHD_IDX_TEXT_MSDF 1
+#define PX_SHD_IDX_TEXT_BITMAP 2
 #define PX_SHD_IDX_OBJECT 0
 #define PX_SHD_IDX_SKYBOX 1
 
