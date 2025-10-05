@@ -55,6 +55,8 @@ PipelineData px::Camera3DRenderer::Downstream(const PipelineData& data)
     if (!data.camera3d) return data;
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(m_Wnd->GetViewportPos().x, m_Wnd->GetViewportPos().y, m_ViewportSize.x, m_ViewportSize.y);
     data.camera3d->Draw(data.ctx, m_ObjectShader, m_SkyboxShader);
 

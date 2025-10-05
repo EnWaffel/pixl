@@ -47,7 +47,7 @@ void px::Text::SetText(const UTFString& text)
         if (!fnt->HasChar(c)) fnt->LoadChar(c);
     }
 
-    size = fnt->GetSize(text, scale);
+    UpdateText();
 }
 
 UTFString px::Text::GetText()
@@ -75,16 +75,101 @@ void px::Text::Center(Axis axis, const Vec2& parentSize)
 	}
 }
 
+void px::Text::UpdateText()
+{
+    size = fnt->GetType() == FontType::MSDF ? fnt->GetSize(m_Text, textSize, scale * textSize / fnt->GetBaseSize()) : fnt->GetSize(m_Text, textSize, scale);
+}
+
 void px::Text::Draw(const DrawData& data)
 {
     if (!fnt) return;
 
-    SHADER shd = data.shaders[PX_SHD_IDX_TEXT];
+    switch (fnt->GetType())
+    {
+    case FontType::MSDF:
+    {
+        DrawMSDF(data);
+        break;
+    }
+    case FontType::BITMAP:
+    {
+        DrawBitmap(data);
+        break;
+    }
+    }
+}
+
+void px::Text::DrawMSDF(const DrawData& data)
+{
+    SHADER shd = data.shaders[PX_SHD_IDX_TEXT_MSDF];
     shd->Use();
+
+    float scale = this->scale * textSize / fnt->GetBaseSize();
 
 	shd->SetBool("px_flip_x", flipX);
 	shd->SetBool("px_flip_y", flipY);
-    shd->SetColor("px_color", color);
+    shd->SetColor("bgColor", bgColor);
+    shd->SetColor("fgColor", fgColor);
+    shd->SetColor("outlineColor", outlineColor);
+    shd->SetFloat("smoothing", smoothingFactor);
+    shd->SetFloat("outlineWidth", outlineWidth);
+    shd->SetFloat("pxRange", 4);
+    //shd->SetFloat("glowSize", glowSize);
+    //shd->SetFloat("glowIntensity", glowIntensity);
+    //shd->SetColor("glowColor", glowColor);
+    
+    float s = (fnt->GetBaseSize() * scale) / fnt->GetBaseSize();
+    float screenPxRange = 4 * s;
+    shd->SetFloat("screenPxRange", screenPxRange);
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, fnt->GetAtlas());
+
+    float offsetX = 0.0f;
+    float offsetY = 0.0f;
+    for (UTFChar c : m_Text)
+    {
+        if (c == U'\n')
+        {
+            offsetY += textSize + lineSpacing;
+            offsetX = 0.0f;
+            continue;
+        }
+
+        Glyph g = fnt->GetCharData(c);
+
+        Vec2 _pos = pos;
+        _pos.x -= data.offset.x * data.scale.x;
+        _pos.y -= data.offset.y * data.scale.y;
+
+        float x = _pos.x + offsetX;
+        float y = _pos.y + offsetY + (g.size.y * scale - g.bearing.y * scale);
+
+        float w = fnt->GetBaseSize() * scale;
+        float h = fnt->GetBaseSize() * scale;
+
+        Mat4 mat;
+
+        mat.Translate(Vec2(x, y));
+        mat.Translate(offset);
+        mat.Scale(Vec2(w, h));
+
+        shd->SetMatrix4("model_matrix", mat);
+        shd->SetInt("atlas_index", g.index);
+        data.ctx->DrawQuad();
+        offsetX += g.drawAdvance * textSize;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void px::Text::DrawBitmap(const DrawData& data)
+{
+    SHADER shd = data.shaders[PX_SHD_IDX_TEXT_BITMAP];
+    shd->Use();
+
+    shd->SetBool("px_flip_x", flipX);
+	shd->SetBool("px_flip_y", flipY);
+    shd->SetColor("px_color", fgColor);
 
     float offsetX = 0.0f;
     float offsetY = 0.0f;
@@ -122,10 +207,10 @@ void px::Text::Draw(const DrawData& data)
 
         shd->SetMatrix4("model_matrix", mat);
 
-        glBindTexture(GL_TEXTURE_2D, g.data);
+        glBindTexture(GL_TEXTURE_2D, g.index);
         data.ctx->DrawQuad();
 
-        offsetX += (g.advance.x >> 6) * scale;
+        offsetX += g.advance * scale;
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);

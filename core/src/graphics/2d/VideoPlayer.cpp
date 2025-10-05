@@ -768,19 +768,20 @@ void px::VideoPlayer::Draw(const DrawData& data)
     Mat4 mat;
     Vec2 diff = Vec2((size.x * scale.x) - size.x, (size.y * scale.y) - size.y);
 
-    mat.Translate(Vec2(_pos.x - (diff.x / 2.0f), _pos.y - (diff.y / 2.0f)));
+    mat.Translate(Vec2(_pos.x - (diff.x / 2.0f), _pos.y - (diff.y / 2.0f)).asVec3());
 
-    mat.Translate(Vec2(size.x * pivotPoint.x * scale.x, size.y * pivotPoint.y * scale.y));
+    mat.Translate(Vec2(size.x * pivotPoint.x * scale.x, size.y * pivotPoint.y * scale.y).asVec3());
     mat.Rotate(Vec3(0.0f, 0.0f, rotation));
-    mat.Translate(Vec2(-(size.x * pivotPoint.x) * scale.x, -(size.y * pivotPoint.y) * scale.y));
+    mat.Translate(Vec2(-(size.x * pivotPoint.x) * scale.x, -(size.y * pivotPoint.y) * scale.y).asVec3());
 
-    mat.Scale(Vec2(size.x + diff.x, size.y + diff.y));
+    mat.Scale(Vec2(size.x + diff.x, size.y + diff.y).asVec3());
 
     m_Impl->Draw(mat, data);
 }
 
 void px::VideoPlayer::Update(float delta)
 {
+    UpdateTweens(delta);
     m_Impl->Update(delta);
 }
 

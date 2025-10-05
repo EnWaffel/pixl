@@ -82,6 +82,7 @@ void px::SoundSystem::Update(float delta)
 
     for (int idx : finishedTempSounds)
     {
+        delete __temp_sounds.at(idx);
         __temp_sounds.erase(__temp_sounds.begin() + idx);
     }
 }

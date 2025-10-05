@@ -45,8 +45,8 @@ void px::SimpleRenderer::DrawRect(const Vec2& pos, const Vec2& size, const Color
     if (!m_Drawing) return;
 
     Mat4 mat;
-    mat.Translate(pos);
-    mat.Scale(size);
+    mat.Translate(pos.asVec3());
+    mat.Scale(size.asVec3());
 
     m_Shader->SetMatrix4("model_matrix", mat);
     m_Shader->SetColor("px_color", color);

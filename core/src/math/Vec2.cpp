@@ -1,5 +1,6 @@
 #include "pixl/core/math/Vec2.h"
 #include "pixl/core/math/Vec2i.h"
+#include "pixl/core/math/Vec3.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -140,4 +141,9 @@ Vec2 px::Vec2::operator-()
 float px::Vec2::Distance(const Vec2& other)
 {
     return sqrtf(powf((other.x - x), 2) + powf(other.y - y, 2));
+}
+
+Vec3 px::Vec2::asVec3() const
+{
+    return Vec3(x, y, 0.0f);
 }

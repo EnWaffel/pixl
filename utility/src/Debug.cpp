@@ -21,4 +21,5 @@ void __pixl_debug_log(const char* file, int line, const char* func, const char* 
     va_end(args);
 
     printf("\n");
+    fflush(stdout);
 }

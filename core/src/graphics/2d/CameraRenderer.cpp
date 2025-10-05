@@ -35,7 +35,8 @@ px::CameraRenderer::~CameraRenderer()
 {
     m_Wnd->GetEventManager()->RemoveListener("__pixl_cam_rend#" + std::to_string((uint64_t)this));
     if (m_SpriteShader) delete m_SpriteShader;
-    if (m_TextShader) delete m_TextShader;
+    if (m_TextMSDFShader) delete m_TextMSDFShader;
+    if (m_TextBitmapShader) delete m_TextBitmapShader;
     if (m_Framebuf) delete m_Framebuf;
 }
 
@@ -45,9 +46,13 @@ void px::CameraRenderer::Construct()
     m_SpriteShader->Use();
     m_SpriteShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 
-    m_TextShader = ShaderCodeBuilder::NewDefault().BasicVertex().Fragment(PX_SHADER_FRAGMENT_TEXT).Compile();
-    m_TextShader->Use();
-    m_TextShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
+    m_TextMSDFShader = ShaderCodeBuilder::NewDefault().BasicVertex().Fragment(PX_SHADER_FRAGMENT_TEXT_MSDF).Compile();
+    m_TextMSDFShader->Use();
+    m_TextMSDFShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
+
+    m_TextBitmapShader = ShaderCodeBuilder::NewDefault().BasicVertex().Fragment(PX_SHADER_FRAGMENT_TEXT_BITMAP).Compile();
+    m_TextBitmapShader->Use();
+    m_TextBitmapShader->SetMatrix4("projection_matrix", Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f));
 
     m_Framebuf = new Framebuffer(m_Wnd->GetViewportSize(), true);
 
@@ -68,7 +73,12 @@ PipelineData px::CameraRenderer::Downstream(const PipelineData& data)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    data.camera->Draw(data.ctx, m_SpriteShader, m_TextShader);
+    SHADER shaders[8] = { 0 };
+    shaders[PX_SHD_IDX_SPRITE] = m_SpriteShader;
+    shaders[PX_SHD_IDX_TEXT_MSDF] = m_TextMSDFShader;
+    shaders[PX_SHD_IDX_TEXT_BITMAP] = m_TextBitmapShader;
+
+    data.camera->Draw(data.ctx, shaders);
 
     m_Framebuf->Unbind();
 

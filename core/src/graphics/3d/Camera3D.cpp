@@ -31,7 +31,7 @@ void Camera3D::Draw(DRAWINGCTX ctx, SHADER objectShader, SHADER skyboxShader)
     data.wnd = m_Wnd;
     data.ctx = ctx;
 
-    data.projectionMatrix = Mat4::Perspective(fov, m_Wnd->GetFixedSize().x / m_Wnd->GetFixedSize().y, 0.1f, 10000.0f);
+    data.projectionMatrix = Mat4::Perspective(fov, m_Wnd->GetFixedSize().x / m_Wnd->GetFixedSize().y, 0.1f, 1000.0f);
     data.viewMatrix = viewMatrix;
     data.viewMatrix.Translate(offset);
 

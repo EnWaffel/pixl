@@ -96,7 +96,7 @@ static MeshTexture LoadEmbeddedTexture(CREFSTR modelName, const aiScene* scene, 
         data.data = (uint8_t*)texture->pcData;
         data.width = texture->mWidth;
         data.height = texture->mHeight;
-        data.format = ImageFormat::RGBA;
+        data.format = ImageFormat::RGB;
     }
 
     MeshTexture tex{};
@@ -151,7 +151,7 @@ static std::vector<MeshTexture> LoadMaterialType(CREFSTR modelName, aiMaterial* 
     return textures;
 }
 
-static Mesh ProcessMesh(CREFSTR modelName, aiMesh* mesh, const aiScene* scene, bool antialiasing)
+static Mesh ProcessMesh(CREFSTR modelName, aiNode* node, aiMesh* mesh, const aiScene* scene, bool antialiasing)
 {
     Mesh m{};
 
@@ -160,8 +160,10 @@ static Mesh ProcessMesh(CREFSTR modelName, aiMesh* mesh, const aiScene* scene, b
         aiVector3D& vertex = mesh->mVertices[i];
         aiVector3D& normal = mesh->mNormals[i];
 
+        aiVector3D transformedVertex = node->mTransformation * vertex;
+
         Vertex vert;
-        vert.pos = Vec3(vertex.x, vertex.y, vertex.z);
+        vert.pos = Vec3(transformedVertex.x, transformedVertex.y, transformedVertex.z);
         vert.normal = Vec3(normal.x, normal.y, normal.z);
 
         if (mesh->mTextureCoords[0])
@@ -203,13 +205,25 @@ static std::vector<Mesh> ProcessNode(CREFSTR modelName, aiNode* node, const aiSc
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(ProcessMesh(modelName, mesh, scene, antialiasing));
+        meshes.push_back(ProcessMesh(modelName, node, mesh, scene, antialiasing));
     }
     
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
         std::vector<Mesh> otherMeshes = ProcessNode(modelName, node->mChildren[i], scene, model, antialiasing);
         meshes.insert(meshes.end(), otherMeshes.begin(), otherMeshes.end());
+    }
+
+    for (Mesh& mesh : meshes)
+    {
+        std::array<float, 16> matrix = {
+            node->mTransformation.a1, node->mTransformation.b1, node->mTransformation.c1, node->mTransformation.d1,
+            node->mTransformation.a2, node->mTransformation.b2, node->mTransformation.c2, node->mTransformation.d2,
+            node->mTransformation.a3, node->mTransformation.b3, node->mTransformation.c3, node->mTransformation.d3,
+            node->mTransformation.a4, node->mTransformation.b4, node->mTransformation.c4, node->mTransformation.d4
+        };
+        
+        mesh.transformation = Mat4(matrix);
     }
 
     return meshes;

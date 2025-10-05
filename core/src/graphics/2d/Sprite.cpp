@@ -169,15 +169,15 @@ void px::Sprite::Draw(const DrawData& data)
 	Mat4 mat;
 	Vec2 diff = Vec2((drawSize.x * scale.x) - drawSize.x, (drawSize.y * scale.y) - drawSize.y);
 
-	mat.Translate(Vec2(drawPos.x - (diff.x / 2.0f), drawPos.y - (diff.y / 2.0f)));
+	mat.Translate(Vec2(drawPos.x - (diff.x / 2.0f), drawPos.y - (diff.y / 2.0f)).asVec3());
 
-	mat.Translate(Vec2(drawSize.x * pivotPoint.x * scale.x, drawSize.y * pivotPoint.y * scale.y));
+	mat.Translate(Vec2(drawSize.x * pivotPoint.x * scale.x, drawSize.y * pivotPoint.y * scale.y).asVec3());
 	mat.Rotate(Vec3(0.0f, 0.0f, rotation + subTex.screenRotation));
-	mat.Translate(Vec2(-(drawSize.x * pivotPoint.x) * scale.x, -(drawSize.y * pivotPoint.y) * scale.y));
+	mat.Translate(Vec2(-(drawSize.x * pivotPoint.x) * scale.x, -(drawSize.y * pivotPoint.y) * scale.y).asVec3());
 	
-	mat.Translate(offset + subTex.screenOffset);
+	mat.Translate(offset.asVec3() + Vec3(subTex.screenOffset.x, subTex.screenOffset.y, 0));
 
-	mat.Scale(Vec2(drawSize.x + diff.x, drawSize.y + diff.y));
+	mat.Scale(Vec2(drawSize.x + diff.x, drawSize.y + diff.y).asVec3());
 
     shd->SetMatrix4("model_matrix", mat);
 	shd->SetVec2("px_uv_coord", drawUVPos);

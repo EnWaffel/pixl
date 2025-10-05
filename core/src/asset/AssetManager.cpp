@@ -423,7 +423,7 @@ AUDIOBUF px::AssetManager::LoadSound(CREFSTR id, CREFSTR path, bool reload)
     return buffer;
 }
 
-FONT px::AssetManager::LoadFont(CREFSTR id, CREFSTR path, uint16_t size, bool antialiasing, bool reload)
+FONT px::AssetManager::LoadFont(CREFSTR id, CREFSTR path, FontType type, uint16_t size, bool antialiasing, bool reload)
 {
     if (__fonts.count(id) > 0 && !reload)
     {
@@ -461,7 +461,7 @@ FONT px::AssetManager::LoadFont(CREFSTR id, CREFSTR path, uint16_t size, bool an
         return nullptr;
     }
 
-    FONT fnt = new Font(buf, face, size, antialiasing);
+    FONT fnt = new Font(buf, face, size, antialiasing, type);
 
     __fonts.insert({ id, fnt });
 

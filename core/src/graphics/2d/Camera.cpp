@@ -23,7 +23,7 @@ void Camera::Update(float delta)
     }
 }
 
-void Camera::Draw(DRAWINGCTX ctx, SHADER spriteShader, SHADER textShader)
+void Camera::Draw(DRAWINGCTX ctx, SHADER* shaders)
 {
     if (!visible) return;
 
@@ -39,14 +39,16 @@ void Camera::Draw(DRAWINGCTX ctx, SHADER spriteShader, SHADER textShader)
     data.projectionMatrix = Mat4::Ortho(0.0f, m_Wnd->GetFixedSize().x, m_Wnd->GetFixedSize().y, 0.0f);
     data.viewMatrix = viewMatrix;
 
-    data.shaders[PX_SHD_IDX_SPRITE] = spriteShader;
-    data.shaders[PX_SHD_IDX_TEXT] = textShader;
+    memcpy(data.shaders, shaders, sizeof(data.shaders));
 
-    spriteShader->Use();
-    spriteShader->SetMatrix4("view_matrix", viewMatrix);
+    data.shaders[PX_SHD_IDX_SPRITE]->Use();
+    data.shaders[PX_SHD_IDX_SPRITE]->SetMatrix4("view_matrix", viewMatrix);
 
-    textShader->Use();
-    textShader->SetMatrix4("view_matrix", viewMatrix);
+    data.shaders[PX_SHD_IDX_TEXT_MSDF]->Use();
+    data.shaders[PX_SHD_IDX_TEXT_MSDF]->SetMatrix4("view_matrix", viewMatrix);
+
+    data.shaders[PX_SHD_IDX_TEXT_BITMAP]->Use();
+    data.shaders[PX_SHD_IDX_TEXT_BITMAP]->SetMatrix4("view_matrix", viewMatrix);
 
     for (DRAWABLE drawable : m_Objects)
     {
@@ -173,12 +175,12 @@ Mat4 px::Camera::CalculateViewMatrix()
 
     Vec2 diff = Vec2((fixedSize.x * zoom) - fixedSize.x, (fixedSize.y * zoom) - fixedSize.y);
 
-    mat.Translate(Vec2(fixedSize.x / 2.0f * zoom, fixedSize.y / 2.0f * zoom));
+    mat.Translate(Vec2(fixedSize.x / 2.0f * zoom, fixedSize.y / 2.0f * zoom).asVec3());
     mat.Rotate(Vec3(0.0f, 0.0f, rotation));
-    mat.Translate(Vec2(-(fixedSize.x / 2.0f) * zoom, -(fixedSize.y / 2.0f) * zoom));
+    mat.Translate(Vec2(-(fixedSize.x / 2.0f) * zoom, -(fixedSize.y / 2.0f) * zoom).asVec3());
 
-    mat.Translate(Vec2(-diff.x / 2.0f, -diff.y / 2.0f));
-    mat.Scale(Vec2(zoom, zoom));
+    mat.Translate(Vec2(-diff.x / 2.0f, -diff.y / 2.0f).asVec3());
+    mat.Scale(Vec2(zoom, zoom).asVec3());
 
     return mat;
 }
