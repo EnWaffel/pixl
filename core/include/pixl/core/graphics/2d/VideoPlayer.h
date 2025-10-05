@@ -3,6 +3,8 @@
 #include "pixl/utility/Defs.h"
 #include "pixl/utility/Error.h"
 #include "pixl/core/graphics/Drawable.h"
+#include "pixl/reflect/Field.h"
+#include "pixl/core/tween/Tweenable.h"
 
 namespace px
 {
@@ -11,7 +13,7 @@ namespace px
     struct VideoPlayerInitData;
 
     class VideoPlayerImpl;
-    class VideoPlayer : public Drawable
+    class VideoPlayer : public FieldAccessor, public Drawable, public Tweenable
     {
     public:
         Vec2 pos;

@@ -3,16 +3,20 @@
 #include "pixl/core/graphics/Drawable.h"
 #include "pixl/core/math/Vec3.h"
 #include "pixl/core/asset/Model.h"
+#include "pixl/core/tween/Tweenable.h"
+#include "pixl/reflect/Field.h"
+#include "pixl/utility/Color.h"
 
 namespace px
 {
-    class PX_API Object3D : public Drawable
+    class PX_API Object3D : public FieldAccessor, public Drawable, public Tweenable
     {
     public:
         Vec3 pos;
         Vec3 scale = Vec3(1.0f);
         Vec3 rotation;
         MODEL model;
+        Color color = PX_WHITE;
     public:
         PX_API Object3D();
         PX_API Object3D(MODEL model);
