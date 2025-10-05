@@ -47,6 +47,7 @@ src/Shaders.cpp
 src/input/Keys.cpp
 src/graphics/3d/Skybox.cpp
 src/asset/CubeMap.cpp
+src/input/Mouse.cpp
 )
 
 if(PX_VIDEO)
@@ -77,6 +78,8 @@ include/
 ../dependencies/assimp/include/
 ../dependencies/libav/include/
 ../dependencies/fmt/include/
+../dependencies/glm/
+../dependencies/msdfgen/
 )
 
 if(WIN32)
@@ -93,6 +96,8 @@ if(WIN32)
     png16
     zlib
     fmt
+    msdfgen-core
+    msdfgen-ext
     )
 else()
     set(LIBS
@@ -101,6 +106,8 @@ else()
     OpenAL
     freetype
     fmt
+    msdfgen-core
+    msdfgen-ext
     )
     
 endif()
