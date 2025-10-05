@@ -46,6 +46,7 @@
 #include "pixl/core/graphics/PostProcessingEffect.h"
 #include "pixl/core/graphics/2d/SimpleRenderer.h"
 #include "pixl/core/input/Keys.h"
+#include "pixl/core/input/Mouse.h"
 
 #define PX_ERROR_GLFW 0x20
 #define PX_ERROR_SERVICE 0x21
@@ -56,6 +57,11 @@ namespace px
     struct InitOptions
     {
         bool errorLogging = true;
+    };
+
+    struct EngineOptions
+    {
+        
     };
 
     /**
@@ -89,24 +95,4 @@ namespace px
      * @return The time since initialization in seconds.
      */
     PX_API float GetTime();
-
-    /**
-     * @brief Returns the position of the user's cursor inside the window size range. (e.g. X: 0 - 1280 | Y: 0 - 720)
-     * 
-     * @param cam Optional parameter for the camera to get the position in. (nullptr = Default Camera)
-     * @param wnd Optional parameter for the window to get the position from. (nullptr = First window created (Root Window))
-     * 
-     * @returns The position of the user's cursor.
-     */
-    PX_API Vec2 GetMousePos(CAMERA cam = nullptr, WINDOW wnd = nullptr);
-    /**
-     * @brief Checks if the user's cursor is touching a sprite.
-     * 
-     * @param sprite The sprite to check for.
-     * @param cam Optional parameter for the camera to get the position in. (nullptr = Default Camera)
-     * @param wnd Optional parameter for the window to get the position from. (nullptr = First window created (Root Window))
-     * 
-     * @returns Whether the user's cursor is touching the sprite.
-     */
-    PX_API bool IsMouseTouchingSprite(SPRITE sprite, CAMERA cam = nullptr, WINDOW wnd = nullptr);
 }
