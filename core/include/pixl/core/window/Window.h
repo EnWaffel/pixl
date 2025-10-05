@@ -53,6 +53,8 @@ namespace px
         PX_API void HideCursor();
         PX_API void ShowCursor();
         PX_API void SetVSync(bool enabled);
+        PX_API void SetTitle(CREFSTR title);
+        PX_API std::string GetTitle();
 
         PX_API void Update(float delta);
         PX_API void UpdateEvents(float delta);

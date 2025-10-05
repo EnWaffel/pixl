@@ -5,6 +5,7 @@
 #include "pixl/core/graphics/2d/WindowRenderer.h"
 #include "pixl/core/graphics/3d/Camera3DRenderer.h"
 #include "pixl/core/input/Keys.h"
+#include "pixl/core/input/Mouse.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -210,6 +211,7 @@ namespace px
             if (__pixl_rootwnd == m_Parent)
             {
                 Keys::Init(m_Parent);
+                Mouse::Init(m_Parent);
             }
         }
 
@@ -243,10 +245,16 @@ namespace px
             {
                 __pixl_timer_update(delta);
                 Keys::Update();
+                Mouse::Update();
             }
 
             m_StaticCamera->Update(delta);
             for (CAMERA camera : m_Cameras)
+            {
+                camera->Update(delta);
+            }
+
+            for (CAMERA3D camera : m_Cameras3D)
             {
                 camera->Update(delta);
             }
@@ -620,6 +628,16 @@ void px::Window::SetVSync(bool enabled)
 void px::Window::HideCursor()
 {
     glfwSetInputMode(m_Impl->m_Handle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
+void px::Window::SetTitle(CREFSTR title)
+{
+    glfwSetWindowTitle(m_Impl->m_Handle, title.c_str());
+}
+
+std::string px::Window::GetTitle()
+{
+    return glfwGetWindowTitle(m_Impl->m_Handle);
 }
 
 void px::Window::Update(float delta)
